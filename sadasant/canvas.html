@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8 />
+    <title>asteroidsjs ~ canvas</title>
+    <!--[if IE]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <style>
+      article, aside, figure, footer, header, hgroup, 
+      menu, nav, section { display: block; }
+      body {
+        background: #000;
+        overflow:hidden;
+      }
+      #info {
+        position:fixed;
+        width:100%;
+        top:0px;
+        text-align:center;
+        color:#96FF00 ;
+      }
+      a:link { color:#96FF00; }
+      a:visited { color:#96FF00; }
+      a:hover { color:#96FF00; }
+    </style>
+  </head>
+  <body>
+    <div id="info">
+        <em><b>asteroidsjs</b> ~ canvas</em></br>
+        First training <a href="http://sadasant.com">I</a> with <a href="https://groups.google.com/group/jsv">jsve</a>.</br>
+        This should be like the asteroids game :|
+        </div>
+    <canvas id="canvas">Loading...</canvas>
+  </body>
+  <script src="canvas.js"></script>
+  <script src="roids.js"></script>
+  <script>
+    /* SETTINGS */
+    window.onload = function() {
+      roids.start(canvas);
+    }
+  </script>
+</html>
