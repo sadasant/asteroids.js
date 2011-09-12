@@ -30,10 +30,10 @@ var roids = (function(){ //
       this.obj.rotation+=rad;
     },
     accelerator: function(much){
-      this.obj.run(1);
+      this.obj.run(0.2);
     },
     brake: function(much){
-      this.obj.run(-1);
+      this.obj.run(-0.2);
     }
   };
 

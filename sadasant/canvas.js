@@ -58,17 +58,20 @@ var canvas = (function(){ //
     this.stroke = stroke || "#96FF00";
     this.moves = [];
     this.rotation = 0;
+    this.speed = {x:0,y:0};
     this.run = function(much){
       much = much || 1;
       this.moves.push(function(con){
         var a = this.rotation,
             x = (0 * Math.cos(a)) - (much * Math.sin(a));
             y = (much * Math.cos(a)) + (0 * Math.sin(a));
-        this.x -= x;
-        this.y -= y;
+        this.speed.x += x;
+        this.speed.y += y;
       });
     };
     this.draw = function(con){
+      if (this.speed.x) this.x -= this.speed.x;
+      if (this.speed.y) this.y -= this.speed.y;
       con.translate(this.x,this.y);
       if (this.rotation) con.rotate(this.rotation);
       if (typeof(this.moves[0]) === "function") {
