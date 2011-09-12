@@ -61,8 +61,11 @@ var canvas = (function(){ //
     this.run = function(much){
       much = much || 1;
       this.moves.push(function(con){
-        this.x = (this.x * Math.cos(this.rotation)) - ((this.y-much) * Math.sin(this.rotation));
-        this.y = ((this.y-much) * Math.cos(this.rotation)) + (this.x * Math.sin(this.rotation));
+        var a = this.rotation,
+            x = (0 * Math.cos(a)) - (much * Math.sin(a));
+            y = (much * Math.cos(a)) + (0 * Math.sin(a));
+        this.x -= x;
+        this.y -= y;
       });
     };
     this.draw = function(con){
