@@ -11,10 +11,11 @@ rendering options we're going to make (css and canvas), that core should be
 * Clearing rectangles works flawlessly.
 * It's advancing forward in any direction
 * It keeps advancing until you push te brake (down arrow)
+* Infinite canvas (the ship goes from one side and comes from the other)
 
 **What should be done soon:**
 
-* infinite canvas (?) I mean the background stuff that doesn't seems to end
+* Asteroids (:o)
 
 **Mini-examples:**
 
