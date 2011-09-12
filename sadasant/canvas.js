@@ -33,8 +33,8 @@ var canvas = (function(){ //
   function drawStack(){
     var can = canvas.can,
         con = canvas.con;
-    if (this.clear) {
-      this.draw(new this.Rect(0, 0, can.width, can.height, this.clear));
+    if (canvas.clear) {
+      canvas.draw(new canvas.Rect(0, 0, can.width, can.height, this.clear),1);
     }
     for (var i in _drawStack){
       con.save();
@@ -43,25 +43,23 @@ var canvas = (function(){ //
     }
   }
   /* PUBLIC METHODS */
-  function draw(obj){
-    _drawStack.push(obj);
+  function draw(obj,first){
+    if (first) _drawStack.splice(0,0,obj);
+    else _drawStack.push(obj);
   }
   /* MOTHERS */
   /* SONS */
-  function Triangle(v,fill,stroke){
-    this.v = v || [[25,25],[105,25],[25,105]];
+  function Triangle(x,y,v,fill,stroke){
+    this.x = x || 0;
+    this.y = y || 0;
+    this.v = v || [[0,-10],[-10,0],[10,0]];
     this.fill = fill || "rgba(150, 255, 0, 0.3)";
     this.stroke = stroke || "#96FF00";
     this.moves = [];
-    this.rotate = function(rad){
-      this.moves.push(function (con) {
-        console.debug(rad);
-        con.translate(this.v[0][0],this.v[0][1]);
-        con.rotate(rad); // not working
-      });
-    };
+    this.rotation = 0;
     this.draw = function(con){
-      console.debug(this.stroke);
+      con.translate(this.x,this.y);
+      if (this.rotation) con.rotate(this.rotation);
       if (typeof(this.moves[0]) === "function") {
         this.moves[0].call(this,con);
         this.moves.shift();
@@ -77,18 +75,27 @@ var canvas = (function(){ //
       con.fill();
     };
   }
+  function Rect(x,y,width,height,fill){
+    /* Todo: put default values */
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.fill = fill || "rgba(0, 0, 0, 0.2)";
+    this.draw = function(con){
+      con.fillRect(this.x, this.y, this.width, this.height);
+    };
+  }
   // GO GO GO!!!
   function start(id,d,width,height){
     this.can = document.getElementById(id || "canvas");
     var win = getWindowSize();
-    this.can.width = win.w;
-    this.can.height = win.h;
+    this.can.width = width || win.w;
+    this.can.height = height || win.h;
     this.center = {x:win.w/2,y:win.h/2};
     this.con = this.can.getContext(d || "2d");
-    this.can.width = width || this.can.width;
-    this.can.height = height || this.can.height;
     this.clear = "rgba(0, 0, 0, 0.05)";
-    this.interval = setInterval(drawStack,3333); // should be between 30 and 35
+    this.interval = setInterval(drawStack,33); // should be between 30 and 35
     if (console && console.debug) console.debug(started);
     return started;
   }
@@ -98,7 +105,8 @@ var canvas = (function(){ //
     con: null, //context
     start: start,
     draw: draw,
-    Triangle: Triangle
+    Triangle: Triangle,
+    Rect: Rect
   };
 }());
  

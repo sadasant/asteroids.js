@@ -20,16 +20,14 @@ var roids = (function(){ //
    */
   function Ship(R){
     if (!R) return;
-    var pos = R.center;
-    this.obj = new R.Triangle([[pos.x,pos.y],[pos.x-10,pos.y+15],[pos.x+10,pos.y+15]]);
+    this.obj = new R.Triangle(R.center.x,R.center.y,[[0,-10],[-10,0],[10,0]]);
     R.draw(this.obj);
   }
   // This should be in a parent, not sure...
   Ship.prototype = { //
     turn: function(to){
-      console.debug("turning "+to);
-      var rad = (to === "left")? 2*Math.PI/3 : Math.PI/3;
-      this.obj.rotate(rad);
+      var rad = Math.PI/30 * ((to === "left")? -1 : 1);
+      this.obj.rotation+=rad;
     },
     accelerator: function(much){
       much = much || 30;
@@ -47,7 +45,7 @@ var roids = (function(){ //
    * for that, we must put the same functions and variables in both methods
    */
   function start(R){
-    this.R = R; // this should do the reference
+    this.R = R; // this should do the reference to the render class
     this.R.start(); // setting the renderer
     this.hero = new Ship(R); // or this.Ship
     // keyboarding!!!
