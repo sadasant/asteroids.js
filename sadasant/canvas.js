@@ -58,6 +58,13 @@ var canvas = (function(){ //
     this.stroke = stroke || "#96FF00";
     this.moves = [];
     this.rotation = 0;
+    this.run = function(much){
+      much = much || 1;
+      this.moves.push(function(con){
+        this.x = (this.x * Math.cos(this.rotation)) - ((this.y-much) * Math.sin(this.rotation));
+        this.y = ((this.y-much) * Math.cos(this.rotation)) + (this.x * Math.sin(this.rotation));
+      });
+    };
     this.draw = function(con){
       con.translate(this.x,this.y);
       if (this.rotation) con.rotate(this.rotation);

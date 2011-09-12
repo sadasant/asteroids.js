@@ -30,8 +30,7 @@ var roids = (function(){ //
       this.obj.rotation+=rad;
     },
     accelerator: function(much){
-      much = much || 30;
-      console.debug("Going forward with "+much+" grades of speed.");
+      this.obj.run();
     },
     brake: function(much){
       much = much || -30;
