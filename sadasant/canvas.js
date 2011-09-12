@@ -39,7 +39,7 @@ var canvas = (function(){ //
     }
     for (var i in _drawStack){
       con.save();
-      _drawStack[i].draw(con);
+      _drawStack[i].draw(can,con);
       con.restore();
     }
   }
@@ -61,23 +61,30 @@ var canvas = (function(){ //
     this.speed = {x:0,y:0};
     this.run = function(much){
       much = much || 1;
-      this.moves.push(function(con){
-        var a = this.rotation,
-            x = (0 * Math.cos(a)) - (much * Math.sin(a));
-            y = (much * Math.cos(a)) + (0 * Math.sin(a));
+      var a = this.rotation,
+          x = (0 * Math.cos(a)) - (much * Math.sin(a));
+          y = (much * Math.cos(a)) + (0 * Math.sin(a));
         this.speed.x += x;
         this.speed.y += y;
-      });
     };
-    this.draw = function(con){
+    this.draw = function(can,con){
+      // if out of space
+      if (this.x > can.width-10)  this.x -= can.width;
+      if (this.x < -10)  this.x += can.width-10;
+      if (this.y > can.height) this.y -= can.height;
+      if (this.y < -10)  this.y += can.height;
+      // add speed
       if (this.speed.x) this.x -= this.speed.x;
       if (this.speed.y) this.y -= this.speed.y;
       con.translate(this.x,this.y);
+      // rotate
       if (this.rotation) con.rotate(this.rotation);
+      // make internal movements
       if (typeof(this.moves[0]) === "function") {
         this.moves[0].call(this,con);
         this.moves.shift();
       }
+      // draw
       con.fillStyle = this.fill;
       con.strokeStyle = this.stroke;
       con.beginPath();
@@ -96,7 +103,7 @@ var canvas = (function(){ //
     this.width = width;
     this.height = height;
     this.fill = fill || "rgba(0, 0, 0, 0.2)";
-    this.draw = function(con){
+    this.draw = function(can,con){
       con.fillStyle = this.fill;
       con.fillRect(this.x, this.y, this.width, this.height);
     };

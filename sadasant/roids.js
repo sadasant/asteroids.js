@@ -29,10 +29,10 @@ var roids = (function(){ //
       var rad = Math.PI/30 * ((to === "left")? -1 : 1);
       this.obj.rotation+=rad;
     },
-    accelerator: function(much){
+    accelerator: function(){
       this.obj.run(0.2);
     },
-    brake: function(much){
+    brake: function(){
       this.obj.run(-0.2);
     }
   };
