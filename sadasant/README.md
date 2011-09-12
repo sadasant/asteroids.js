@@ -10,13 +10,11 @@ rendering options we're going to make (css and canvas), that core should be
 * It rotates with the left-right keys.
 * Clearing rectangles works flawlessly.
 * It's advancing forward in any direction
-* No acceleration yet, just velocity
-* The movement cant be done while rotating
+* It keeps advancing until you push te brake (down arrow)
 
 **What should be done soon:**
 
-* Rotate while moving forward in any angle
-* Add velocity in the equation.
+* infinite canvas (?) I mean the background stuff that doesn't seems to end
 
 **Mini-examples:**
 
