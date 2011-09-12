@@ -35,6 +35,7 @@ var canvas = (function(){ //
         con = canvas.con;
     if (canvas.clear) {
       canvas.draw(new canvas.Rect(0, 0, can.width, can.height, this.clear),1);
+      canvas.clear = null;
     }
     for (var i in _drawStack){
       con.save();
@@ -83,6 +84,7 @@ var canvas = (function(){ //
     this.height = height;
     this.fill = fill || "rgba(0, 0, 0, 0.2)";
     this.draw = function(con){
+      con.fillStyle = this.fill;
       con.fillRect(this.x, this.y, this.width, this.height);
     };
   }
@@ -94,7 +96,7 @@ var canvas = (function(){ //
     this.can.height = height || win.h;
     this.center = {x:win.w/2,y:win.h/2};
     this.con = this.can.getContext(d || "2d");
-    this.clear = "rgba(0, 0, 0, 0.05)";
+    this.clear = "rgba(0, 0, 0, 0.02)";
     this.interval = setInterval(drawStack,33); // should be between 30 and 35
     if (console && console.debug) console.debug(started);
     return started;

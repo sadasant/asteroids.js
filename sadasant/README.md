@@ -13,7 +13,7 @@ rendering options we're going to make (css and canvas), that core should be
 
 *  The rent is too damn high (it's consuming a lot of processing).
 
-**Mini-examples**
+**Mini-examples:**
 
 * [Rotating a triangle with canvas](http://jsfiddle.net/sadasant/3sBRh/4/)
 
