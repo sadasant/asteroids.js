@@ -6,11 +6,15 @@ rendering options we're going to make (css and canvas), that core should be
 
 **What is done:**
 
-*  It shows a triangle in the center of the screen!
+*  It shows a triangle in the center of the screen.
+*  It rotates with the left-right keys.
 
 **What should be done soon:**
 
-*    Rotations of the triangle with the left-right keys.
+*  The rent is too damn high (it's consuming a lot of processing).
+
+**Mini-examples**
+* [Rotating a triangle with canvas](http://jsfiddle.net/sadasant/3sBRh/4/)
 
 I guess that's it :D
 
