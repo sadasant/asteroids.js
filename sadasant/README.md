@@ -8,10 +8,11 @@ rendering options we're going to make (css and canvas), that core should be
 
 *  It shows a triangle in the center of the screen.
 *  It rotates with the left-right keys.
+*  Clearing rectangles works flawlessly.
 
 **What should be done soon:**
 
-*  The rent is too damn high (it's consuming a lot of processing).
+*  Acceleration and brake.
 
 **Mini-examples:**
 
