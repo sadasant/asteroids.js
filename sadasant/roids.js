@@ -48,15 +48,17 @@ var roids = (function(){ //
     this.hero = new Ship(R); // or this.Ship
     // keyboarding!!!
     document.addEventListener("keydown",function (e) {
+      var i = 0;
       switch (e.charCode || e.keyCode){ //
         // turning
-        case 37:roids.hero.turn("left");  break;
-        case 39:roids.hero.turn("right"); break;
+        case 37:roids.hero.turn("left"); i++; break;
+        case 39:roids.hero.turn("right"); i++; break;
         // accelerator
-        case 38:roids.hero.accelerator(); break;
+        case 38:roids.hero.accelerator(); i++; break;
         // brake
-        case 40:roids.hero.brake(); break;
+        case 40:roids.hero.brake(); i++; break;
       }
+      if (i) return e.preventDefault();
     },true);
     if (console && console.debug) console.debug(started);
     return started;
