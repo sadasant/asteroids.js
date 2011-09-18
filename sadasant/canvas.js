@@ -48,34 +48,78 @@ var canvas = (function(){ //
     if (first) _drawStack.splice(0,0,obj);
     else _drawStack.push(obj);
   }
+  function fork(from,to){
+    for (var i in from){
+      if (from.hasOwnProperty(i)) {
+        to[i] = from[i];
+      }
+    }
+  }
   /* MOTHERS */
-  /* SONS */
-  function Triangle(x,y,v,fill,stroke){
-    this.x = x || 0;
-    this.y = y || 0;
-    this.v = v || [[0,-10],[-10,0],[10,0]];
-    this.fill = fill || "rgba(150, 255, 0, 0.3)";
-    this.stroke = stroke || "#96FF00";
-    this.moves = [];
-    this.rotation = 0;
-    this.speed = {x:0,y:0};
-    this.run = function(much){
+  function F() {}
+  F.prototype = {
+    foreverInScope: function(can,con){
+      if (this.x > can.width-10)  this.x -= can.width;
+      if (this.x < -10)  this.x += can.width-10;
+      if (this.y > can.height) this.y -= can.height;
+      if (this.y < -10)  this.y += can.height;
+    },
+    maxSpeed: {x:10, y:10},
+    run: function(much){
       much = much || 1;
       var a = this.rotation,
           x = (0 * Math.cos(a)) - (much * Math.sin(a));
           y = (much * Math.cos(a)) + (0 * Math.sin(a));
         this.speed.x += x;
         this.speed.y += y;
+        var abs = {x:Math.abs(this.speed.x),y:Math.abs(this.speed.y)};
+        if (abs.x > this.maxSpeed.x) {
+          this.speed.x = (abs.x/this.speed.x)*this.maxSpeed.x;
+        }
+        if (abs.y > this.maxSpeed.y) {
+          this.speed.y = (abs.y/this.speed.y)*this.maxSpeed.y;
+        }
+    },
+    repos: function(){
+      //var a = this.rotation,
+      //    x = (0 * Math.cos(a)) - (this.speed.x * Math.sin(a));
+      //    y = (this.speed.y * Math.cos(a)) + (0 * Math.sin(a));
+        this.x -= this.speed.x || 0;
+        this.y -= this.speed.y || 0;
+    }
+  };
+  
+  /* SONS */
+  function Rect(x,y,width,height,fill){
+    /* Todo: put default values */
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.fill = fill || "rgba(0, 0, 0, 0.2)";
+    this.draw = function(can,con){
+      con.fillStyle = this.fill;
+      con.fillRect(this.x, this.y, this.width, this.height);
     };
+  }
+  function Path(x,y,v,fill,stroke){
+    fork(F.prototype,this); // FORKING
+    this.x = x || 0;
+    this.y = y || 0;
+    this.v = v || [];
+    this.fill = fill || "rgba(255, 255, 255, 0.3)";
+    this.stroke = stroke || "rgba(255, 255, 255, 1)";
+    this.moves = [];
+    this.rotation = 0;
+    this.speed = {x:0,y:0};
+    /* behavior variables */
+    this.infiniteScope = null;
+    /* draw method */
     this.draw = function(can,con){
       // if out of space
-      if (this.x > can.width-10)  this.x -= can.width;
-      if (this.x < -10)  this.x += can.width-10;
-      if (this.y > can.height) this.y -= can.height;
-      if (this.y < -10)  this.y += can.height;
+      if (this.infiniteScope) this.foreverInScope(can,con);
       // add speed
-      if (this.speed.x) this.x -= this.speed.x;
-      if (this.speed.y) this.y -= this.speed.y;
+      if (this.speed.x || this.speed.y) this.repos();
       con.translate(this.x,this.y);
       // rotate
       if (this.rotation) con.rotate(this.rotation);
@@ -88,25 +132,22 @@ var canvas = (function(){ //
       con.fillStyle = this.fill;
       con.strokeStyle = this.stroke;
       con.beginPath();
-      con.moveTo(this.v[0][0],this.v[0][1]);
-      con.lineTo(this.v[1][0],this.v[1][1]);
-      con.lineTo(this.v[2][0],this.v[2][1]);
+      for (var v in this.v){
+        if (!v) con.moveTo(this.v[v][0],this.v[v][1]);
+        else con.lineTo(this.v[v][0],this.v[v][1]);
+      }
       con.closePath();
       con.stroke();
       con.fill();
     };
   }
-  function Rect(x,y,width,height,fill){
-    /* Todo: put default values */
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.fill = fill || "rgba(0, 0, 0, 0.2)";
-    this.draw = function(can,con){
-      con.fillStyle = this.fill;
-      con.fillRect(this.x, this.y, this.width, this.height);
-    };
+  function Triangle(x,y,v,fill,stroke){
+    x = x || 0;
+    y = y || 0;
+    v = v || [[0,-10],[-10,0],[10,0]];
+    fill = fill || "rgba(255, 255, 255, 0.3)";
+    stroke = stroke || "rgba(255, 255, 255, 1)";
+    return new Path(x,y,v,fill,stroke);
   }
   // GO GO GO!!!
   function start(id,d,width,height){
@@ -127,8 +168,9 @@ var canvas = (function(){ //
     con: null, //context
     start: start,
     draw: draw,
-    Triangle: Triangle,
-    Rect: Rect
+    Path: Path,
+    Rect: Rect,
+    Triangle: Triangle
   };
 }());
  
