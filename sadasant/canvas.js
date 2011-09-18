@@ -64,28 +64,37 @@ var canvas = (function(){ //
       if (this.y > can.height) this.y -= can.height;
       if (this.y < -10)  this.y += can.height;
     },
+    rotateInEdge: false,
     maxSpeed: {x:10, y:10},
     run: function(much){
       much = much || 1;
-      var a = this.rotation,
-          x = (0 * Math.cos(a)) - (much * Math.sin(a));
-          y = (much * Math.cos(a)) + (0 * Math.sin(a));
+      if (this.rotateInEdge) {
+        var a = this.rotation,
+            x = (0 * Math.cos(a)) - (much * Math.sin(a));
+            y = (much * Math.cos(a)) + (0 * Math.sin(a));
         this.speed.x += x;
         this.speed.y += y;
-        var abs = {x:Math.abs(this.speed.x),y:Math.abs(this.speed.y)};
-        if (abs.x > this.maxSpeed.x) {
-          this.speed.x = (abs.x/this.speed.x)*this.maxSpeed.x;
-        }
-        if (abs.y > this.maxSpeed.y) {
-          this.speed.y = (abs.y/this.speed.y)*this.maxSpeed.y;
-        }
+      } else {
+        this.speed.x += much;
+        this.speed.y += much;
+      }
+      var abs = {x:Math.abs(this.speed.x),y:Math.abs(this.speed.y)};
+      if (abs.x > this.maxSpeed.x) {
+        this.speed.x = (abs.x/this.speed.x)*this.maxSpeed.x;
+      }
+      if (abs.y > this.maxSpeed.y) {
+        this.speed.y = (abs.y/this.speed.y)*this.maxSpeed.y;
+      }
     },
     repos: function(){
-      //var a = this.rotation,
-      //    x = (0 * Math.cos(a)) - (this.speed.x * Math.sin(a));
-      //    y = (this.speed.y * Math.cos(a)) + (0 * Math.sin(a));
-        this.x -= this.speed.x || 0;
-        this.y -= this.speed.y || 0;
+      if (this.rotateInEdge) {
+        this.x -= this.speed.x;
+        this.y -= this.speed.y;
+      } else {
+        var a = this.rotation;
+        this.x -= (0 * Math.cos(a)) - (this.speed.x * Math.sin(a));
+        this.y -= (this.speed.y * Math.cos(a)) + (0 * Math.sin(a));
+      }
     }
   };
   

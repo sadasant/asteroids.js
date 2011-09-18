@@ -33,12 +33,15 @@ var roids = (function(){ //
       this.obj.rotation+=rad;
     },
     accelerator: function(much){
-      much = much || 0.2;
+      much = much || 0.5;
       this.obj.run(much);
     },
     brake: function(much){
-      much = much || 0.2;
+      much = much || 0.5;
       this.obj.run(-much);
+    },
+    inEdge: function(){
+      this.obj.rotateInEdge = true;
     }
   };
   /* The Ship class. */
@@ -91,30 +94,28 @@ var roids = (function(){ //
     this.hero = new Ship(R); // or this.Ship
     for (var i = 0; i < 11; i++){
       this.rocks.push(new Rock(R,true));
+      this.rocks[i].inEdge();
       this.rocks[i].randomize();
     }
     // keyboarding!!!
-    var lastKey = null;
+    var keys = {
+      37:null,
+      38:null,
+      39:null,
+      40:null
+    };
     document.addEventListener("keydown",function (e) {
       var i = 0, key = e.charCode || e.keyCode;
-      if (key == 37 || lastKey == 37) {
-        roids.hero.turn("left"); i++;
-      }
-      if (key == 39 || lastKey == 39) {
-        roids.hero.turn("right"); i++;
-      }
-      if (key == 38 || lastKey == 38) {
-        roids.hero.accelerator(); i++;
-      }
-      if (key == 40 || lastKey == 40) {
-        roids.hero.brake(); i++;
-      }
-      if (lastKey === null) lastKey = key;
+      if (keys[key] === null) keys[key] = true;
+      if (keys[37]) { roids.hero.turn("left"); i++; }
+      if (keys[39]) { roids.hero.turn("right"); i++; }
+      if (keys[38]) { roids.hero.accelerator(); i++; }
+      if (keys[40]) { roids.hero.brake(); i++; }
       if (i) return e.preventDefault();
     },true);
     document.addEventListener("keyup",function (e) {
       var key = e.charCode || e.keyCode;
-      if (key == lastKey) lastKey = null;
+      if (keys[key]) keys[key] = null;
     },true);
     if (console && console.debug) console.debug(started);
     return started;
