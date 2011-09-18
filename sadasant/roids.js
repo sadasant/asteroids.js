@@ -29,7 +29,7 @@ var roids = (function(){ //
   };
   Obj.prototype = {
     turn: function(to){
-      var rad = (typeof(to) == "number") ? to*(Math.PI/180) : Math.PI/30 * ((to === "left")? -1 : 1);
+      var rad = to*(Math.PI/180);
       this.obj.rotation+=rad;
     },
     accelerator: function(much){
@@ -69,7 +69,6 @@ var roids = (function(){ //
     this.intervals = [];
     this.randomize = function(){
       this.intervals.push(setInterval((function(obj){
-        console.debug('lol');
         var init = 180*Math.random(),
             rotate = 1 + 5*Math.random() * ((Math.floor(2*Math.random()))? -1 : 1),
             accel = Math.ceil(180*Math.random())/100;
@@ -107,8 +106,8 @@ var roids = (function(){ //
     document.addEventListener("keydown",function (e) {
       var i = 0, key = e.charCode || e.keyCode;
       if (keys[key] === null) keys[key] = true;
-      if (keys[37]) { roids.hero.turn("left"); i++; }
-      if (keys[39]) { roids.hero.turn("right"); i++; }
+      if (keys[37]) { roids.hero.turn(-10); i++; }
+      if (keys[39]) { roids.hero.turn(10); i++; }
       if (keys[38]) { roids.hero.accelerator(); i++; }
       if (keys[40]) { roids.hero.brake(); i++; }
       if (i) return e.preventDefault();
