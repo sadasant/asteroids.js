@@ -95,6 +95,20 @@ var canvas = (function(){ //
         this.x -= (0 * Math.cos(a)) - (this.speed.x * Math.sin(a));
         this.y -= (this.speed.y * Math.cos(a)) + (0 * Math.sin(a));
       }
+    },
+    // lame collide
+    addCollider: function(obj){
+      this.colliders.push(obj);
+    },
+    collide: function(){
+      for (var i in this.colliders) {
+        var diffx = Math.abs(this.colliders[i].x - this.x),
+            diffy = Math.abs(this.colliders[i].y - this.y);
+        if (diffx < 10 && diffy < 10) {
+          this.fill = "rgba(255, 0, 0, 0.3)";
+          this.stroke = "rgba(255, 0, 0, 1)";
+        }
+      }
     }
   };
   
@@ -123,6 +137,8 @@ var canvas = (function(){ //
     this.speed = {x:0,y:0};
     /* behavior variables */
     this.infiniteScope = null;
+    /* Lame colliders */
+    this.colliders = [];
     /* draw method */
     this.draw = function(can,con){
       // if out of space
@@ -132,6 +148,10 @@ var canvas = (function(){ //
       con.translate(this.x,this.y);
       // rotate
       if (this.rotation) con.rotate(this.rotation);
+      // collide
+      if (this.colliders.length){
+        this.collide();
+      }
       // make internal movements
       if (typeof(this.moves[0]) === "function") {
         this.moves[0].call(this,con);

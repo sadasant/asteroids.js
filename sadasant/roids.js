@@ -69,9 +69,9 @@ var roids = (function(){ //
     this.intervals = [];
     this.randomize = function(){
       this.intervals.push(setInterval((function(obj){
-        var init = 180*Math.random(),
-            rotate = 1 + 5*Math.random() * ((Math.floor(2*Math.random()))? -1 : 1),
-            accel = Math.ceil(180*Math.random())/100;
+        var init = 180 * Math.random(),
+          rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1),
+          accel = Math.ceil(180*Math.random())/100;
         obj.turn(init);
         obj.accelerator(accel);
         return function(){
@@ -95,6 +95,7 @@ var roids = (function(){ //
       this.rocks.push(new Rock(R,true));
       this.rocks[i].inEdge();
       this.rocks[i].randomize();
+      this.hero.obj.addCollider(this.rocks[i].obj);
     }
     // keyboarding!!!
     var keys = {
