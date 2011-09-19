@@ -97,20 +97,30 @@ var roids = (function(){ //
       this.rocks[i].randomize();
       this.hero.obj.addCollider(this.rocks[i].obj);
     }
+    setTimeout(function(){
+      return;
+      for (var i in roids.rocks){
+        for (var ii in roids.rocks){
+          console.debug(i,ii);
+          if (i == ii) continue;
+          roids.rocks[i].obj.addCollider(roids.rocks[i].obj);
+        }
+      }
+    },500);
     // keyboarding!!!
     var keys = {
-      37:null,
-      38:null,
-      39:null,
-      40:null
+      37:null, 65:null,
+      38:null, 87:null,
+      39:null, 68:null,
+      40:null, 83:null
     };
     document.addEventListener("keydown",function (e) {
       var i = 0, key = e.charCode || e.keyCode;
       if (keys[key] === null) keys[key] = true;
-      if (keys[37]) { roids.hero.turn(-10); i++; }
-      if (keys[39]) { roids.hero.turn(10); i++; }
-      if (keys[38]) { roids.hero.accelerator(); i++; }
-      if (keys[40]) { roids.hero.brake(); i++; }
+      if (keys[37] || keys[65]) { roids.hero.turn(-10); i++; }
+      if (keys[39] || keys[68]) { roids.hero.turn(10); i++; }
+      if (keys[38] || keys[87]) { roids.hero.accelerator(); i++; }
+      if (keys[40] || keys[83]) { roids.hero.brake(); i++; }
       if (i) return e.preventDefault();
     },true);
     document.addEventListener("keyup",function (e) {

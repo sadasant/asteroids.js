@@ -104,7 +104,7 @@ var canvas = (function(){ //
       for (var i in this.colliders) {
         var diffx = Math.abs(this.colliders[i].x - this.x),
             diffy = Math.abs(this.colliders[i].y - this.y);
-        if (diffx < 10 && diffy < 10) {
+        if (diffx < 15 && diffy < 15) {
           this.fill = "rgba(255, 0, 0, 0.3)";
           this.stroke = "rgba(255, 0, 0, 1)";
         }
