@@ -125,7 +125,10 @@ var roids = (function(){ //
     },true);
     document.addEventListener("keyup",function (e) {
       var key = e.charCode || e.keyCode;
-      if (keys[key]) keys[key] = null;
+      if (keys[key]){
+        keys[key] = null;
+        return e.preventDefault();
+      }
     },true);
     if (console && console.debug) console.debug(started);
     return started;
