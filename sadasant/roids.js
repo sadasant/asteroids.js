@@ -98,12 +98,11 @@ var roids = (function(){ //
       this.hero.obj.addCollider(this.rocks[i].obj);
     }
     setTimeout(function(){
-      return;
       for (var i in roids.rocks){
         for (var ii in roids.rocks){
-          console.debug(i,ii);
           if (i == ii) continue;
-          roids.rocks[i].obj.addCollider(roids.rocks[i].obj);
+          console.debug(i,ii);
+          roids.rocks[i].obj.addCollider(roids.rocks[ii].obj);
         }
       }
     },500);
