@@ -55,17 +55,27 @@ var roids = (function(){ //
     R.draw(this.obj);
   }
   /* The Rock class */
-  function Rock(R,random){
+  function Rock(R,size,random,x,y){
     if (!R) return;
     fork(Obj.prototype,this); // FORKING
-    var path = [[0,-20],[-20,0],[-10,20],[20,0]];
+    var path = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]];
     var fill = "rgba(150, 255, 0, 0.3)",
       stroke = "rgba(150, 255, 0, 1  )",
-        posx = random ? Math.floor(R.can.width*Math.random()) : R.center.x ,
-        posy = random ? Math.floor(R.can.height*Math.random()) : R.center.y ;
+        posx = x ||(random?Math.floor(R.can.width*Math.random()) :R.center.x),
+        posy = y ||(random?Math.floor(R.can.height*Math.random()):R.center.y);
     this.obj = new R.Path(posx,posy,path,fill,stroke);
     this.obj.infiniteScope = true;
+    // onCollide
     this.obj.onCollide = (function(){
+      var x = this.obj.x,
+          y = this.obj.y,
+          rock1 = new Rock(R,1,true,x,y),
+          rock2 = new Rock(R,1,true,x,y);
+      rock1.inEdge(); rock1.randomize();
+      rock2.inEdge(); rock2.randomize();
+      roids.rocks.push(rock1,rock2);
+      roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-1]);
+      roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-2]);
       roids.R.remove(this.obj);
     }).bind(this);
     R.draw(this.obj);
@@ -95,7 +105,7 @@ var roids = (function(){ //
     this.R.start(); // setting the renderer
     this.hero = new Ship(R); // or this.Ship
     for (var i = 0; i < 11; i++){
-      this.rocks.push(new Rock(R,true));
+      this.rocks.push(new Rock(R,2,true));
       this.rocks[i].inEdge();
       this.rocks[i].randomize();
       this.hero.obj.addCollider(this.rocks[i].obj);
