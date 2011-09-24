@@ -9,7 +9,8 @@
 var canvas = (function(){ //
   /* PRIVATE VARS */
   var started = "You've started canvas.js",
-      _drawStack = [],
+      _drawStack = {},
+      ids = 0,
       apply_draw = null;
   /* PRIVATE METHODS */
   getWindowSize = function() {
@@ -45,8 +46,11 @@ var canvas = (function(){ //
   }
   /* PUBLIC METHODS */
   function draw(obj,first){
-    if (first) _drawStack.splice(0,0,obj);
-    else _drawStack.push(obj);
+    _drawStack[obj.id] = obj;
+  }
+  function remove(obj){
+    console.debug(obj);
+    delete _drawStack[obj.id];
   }
   function fork(from,to){
     for (var i in from){
@@ -100,13 +104,16 @@ var canvas = (function(){ //
     addCollider: function(obj){
       this.colliders.push(obj);
     },
+    onCollide: function(){
+      this.fill = "rgba(255, 0, 0, 0.3)";
+      this.stroke = "rgba(255, 0, 0, 1)";
+    },
     collide: function(){
       for (var i in this.colliders) {
         var diffx = Math.abs(this.colliders[i].x - this.x),
             diffy = Math.abs(this.colliders[i].y - this.y);
         if (diffx < 15 && diffy < 15) {
-          this.fill = "rgba(255, 0, 0, 0.3)";
-          this.stroke = "rgba(255, 0, 0, 1)";
+          this.onCollide();
         }
       }
     }
@@ -115,6 +122,7 @@ var canvas = (function(){ //
   /* SONS */
   function Rect(x,y,width,height,fill){
     /* Todo: put default values */
+    this.id = (ids++).toString();
     this.x = x;
     this.y = y;
     this.width = width;
@@ -127,6 +135,7 @@ var canvas = (function(){ //
   }
   function Path(x,y,v,fill,stroke){
     fork(F.prototype,this); // FORKING
+    this.id = (ids++).toString();
     this.x = x || 0;
     this.y = y || 0;
     this.v = v || [];
@@ -149,9 +158,7 @@ var canvas = (function(){ //
       // rotate
       if (this.rotation) con.rotate(this.rotation);
       // collide
-      if (this.colliders.length){
-        this.collide();
-      }
+      if (this.colliders.length) this.collide();
       // make internal movements
       if (typeof(this.moves[0]) === "function") {
         this.moves[0].call(this,con);
@@ -171,6 +178,7 @@ var canvas = (function(){ //
     };
   }
   function Triangle(x,y,v,fill,stroke){
+    this.id = (ids++).toString();
     x = x || 0;
     y = y || 0;
     v = v || [[0,-10],[-10,0],[10,0]];
@@ -197,6 +205,7 @@ var canvas = (function(){ //
     con: null, //context
     start: start,
     draw: draw,
+    remove: remove,
     Path: Path,
     Rect: Rect,
     Triangle: Triangle

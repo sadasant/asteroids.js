@@ -65,6 +65,9 @@ var roids = (function(){ //
         posy = random ? Math.floor(R.can.height*Math.random()) : R.center.y ;
     this.obj = new R.Path(posx,posy,path,fill,stroke);
     this.obj.infiniteScope = true;
+    this.obj.onCollide = (function(){
+      roids.R.remove(this.obj);
+    }).bind(this);
     R.draw(this.obj);
     this.intervals = [];
     this.randomize = function(){
@@ -101,7 +104,6 @@ var roids = (function(){ //
       for (var i in roids.rocks){
         for (var ii in roids.rocks){
           if (i == ii) continue;
-          console.debug(i,ii);
           roids.rocks[i].obj.addCollider(roids.rocks[ii].obj);
         }
       }
