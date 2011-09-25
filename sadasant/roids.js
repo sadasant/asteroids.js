@@ -14,7 +14,8 @@
 var roids = (function(){ //
   // All this codes are just for pre-defining the object
   // so here be hidden vars and methods
-  var started = "You've started roids.js";
+  var started = "You've started roids.js",
+      ids = 0;
   
   function fork(from,to){
     for (var i in from){
@@ -47,17 +48,24 @@ var roids = (function(){ //
   /* The Ship class. */
   function Ship(R){
     if (!R) return;
+    this.id = (ids++).toString();
     fork(Obj.prototype,this); // FORKING
     var fill = "rgba(150, 255, 0, 0.3)",
       stroke = "rgba(150, 255, 0, 1  )";
     this.obj = new R.Triangle(R.center.x,R.center.y,null,fill,stroke);
     this.obj.infiniteScope = true;
     R.draw(this.obj);
+    this.obj.onCollide = (function(){
+      roids.R.remove(this.obj);
+    }).bind(this);
   }
   /* The Rock class */
   function Rock(R,size,random,x,y){
     if (!R) return;
+    this.id = (ids++).toString();
+    this.colliders = [];
     fork(Obj.prototype,this); // FORKING
+    this.level = size || 2;
     var path = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]];
     var fill = "rgba(150, 255, 0, 0.3)",
       stroke = "rgba(150, 255, 0, 1  )",
@@ -66,25 +74,31 @@ var roids = (function(){ //
     this.obj = new R.Path(posx,posy,path,fill,stroke);
     this.obj.infiniteScope = true;
     // onCollide
+    this.obj.collideArea = size*10 + 5;
     this.obj.onCollide = (function(){
-      var x = this.obj.x,
-          y = this.obj.y,
-          rock1 = new Rock(R,1,true,x,y),
-          rock2 = new Rock(R,1,true,x,y);
-      rock1.inEdge(); rock1.randomize();
-      rock2.inEdge(); rock2.randomize();
-      roids.rocks.push(rock1,rock2);
-      roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-1]);
-      roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-2]);
+      var less = 1;
+      if (this.level && this.level-less) {
+        var x = this.obj.x,
+            y = this.obj.y,
+            rock1 = new Rock(R,this.level-less,true,x,y),
+            rock2 = new Rock(R,this.level-less,true,x,y);
+        rock1.inEdge(); rock1.randomize(260);
+        rock2.inEdge(); rock2.randomize();
+        roids.rocks.push(rock1,rock2);
+        roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-1].obj);
+        roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-2].obj);
+        updateRockColliders(1500);
+      }
       roids.R.remove(this.obj);
     }).bind(this);
     R.draw(this.obj);
     this.intervals = [];
-    this.randomize = function(){
+    this.randomize = function(range){
+      range = range || 180;
       this.intervals.push(setInterval((function(obj){
-        var init = 180 * Math.random(),
+        var init = range * Math.random(),
           rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1),
-          accel = Math.ceil(180*Math.random())/100;
+          accel = Math.ceil(range*Math.random())/100;
         obj.turn(init);
         obj.accelerator(accel);
         return function(){
@@ -93,8 +107,24 @@ var roids = (function(){ //
         };
      })(this),35));
     };
+    this.updateColliders = function(){
+      for (var i in roids.rocks){
+        var id = roids.rocks[i].id;
+        if (id !== this.id && this.colliders.indexOf(id) === -1){
+          this.colliders.push(id);
+          this.obj.addCollider(roids.rocks[i].obj);
+        }
+      }
+    };
   }
-  
+  function updateRockColliders(t){
+    t = t || 500;
+    setTimeout(function(){
+      for (var i in roids.rocks){
+        roids.rocks[i].updateColliders();
+      }
+    },t);
+  }
   /* The start function
    * "Where everything begins"
    * The R argument will decide if we'll work with canvas or css
@@ -105,19 +135,12 @@ var roids = (function(){ //
     this.R.start(); // setting the renderer
     this.hero = new Ship(R); // or this.Ship
     for (var i = 0; i < 11; i++){
-      this.rocks.push(new Rock(R,2,true));
+      this.rocks.push(new Rock(R,3,true));
       this.rocks[i].inEdge();
       this.rocks[i].randomize();
       this.hero.obj.addCollider(this.rocks[i].obj);
     }
-    setTimeout(function(){
-      for (var i in roids.rocks){
-        for (var ii in roids.rocks){
-          if (i == ii) continue;
-          roids.rocks[i].obj.addCollider(roids.rocks[ii].obj);
-        }
-      }
-    },500);
+    updateRockColliders();
     // keyboarding!!!
     var keys = {
       37:null, 65:null,

@@ -49,7 +49,6 @@ var canvas = (function(){ //
     _drawStack[obj.id] = obj;
   }
   function remove(obj){
-    console.debug(obj);
     delete _drawStack[obj.id];
   }
   function fork(from,to){
@@ -108,11 +107,12 @@ var canvas = (function(){ //
       this.fill = "rgba(255, 0, 0, 0.3)";
       this.stroke = "rgba(255, 0, 0, 1)";
     },
+    collideArea: 15,
     collide: function(){
       for (var i in this.colliders) {
         var diffx = Math.abs(this.colliders[i].x - this.x),
             diffy = Math.abs(this.colliders[i].y - this.y);
-        if (diffx < 15 && diffy < 15) {
+        if (diffx < this.collideArea && diffy < this.collideArea) {
           this.onCollide();
         }
       }
