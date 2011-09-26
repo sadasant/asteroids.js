@@ -11,6 +11,7 @@ var canvas = (function(){ //
   var started = "You've started canvas.js",
       _drawStack = {},
       ids = 0,
+      removed = [],
       apply_draw = null;
   /* PRIVATE METHODS */
   getWindowSize = function() {
@@ -49,6 +50,7 @@ var canvas = (function(){ //
     _drawStack[obj.id] = obj;
   }
   function remove(obj){
+    removed.push(obj.id);
     delete _drawStack[obj.id];
   }
   function fork(from,to){
@@ -113,7 +115,11 @@ var canvas = (function(){ //
         var diffx = Math.abs(this.colliders[i].x - this.x),
             diffy = Math.abs(this.colliders[i].y - this.y);
         if (diffx < this.collideArea && diffy < this.collideArea) {
-          this.onCollide();
+          if (removed.indexOf(this.colliders[i].id) !== -1) { // lame solution
+            delete this.colliders[i];
+          } else {
+            this.onCollide();
+          }
         }
       }
     }

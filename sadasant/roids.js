@@ -134,13 +134,16 @@ var roids = (function(){ //
     this.R = R; // this should do the reference to the render class
     this.R.start(); // setting the renderer
     this.hero = new Ship(R); // or this.Ship
-    for (var i = 0; i < 11; i++){
-      this.rocks.push(new Rock(R,3,true));
-      this.rocks[i].inEdge();
-      this.rocks[i].randomize();
-      this.hero.obj.addCollider(this.rocks[i].obj);
-    }
-    updateRockColliders();
+    setInterval(function(){
+      for (var i = 0; i < 3; i++){
+        this.rocks.push(new Rock(R,3,true));
+        var l = this.rocks.length-1;
+        this.rocks[l].inEdge();
+        this.rocks[l].randomize();
+        this.hero.obj.addCollider(this.rocks[l].obj);
+      }
+      updateRockColliders();
+    }.bind(this),11000);
     // keyboarding!!!
     var keys = {
       37:null, 65:null,
