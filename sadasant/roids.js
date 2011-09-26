@@ -76,12 +76,16 @@ var roids = (function(){ //
     // onCollide
     this.obj.collideArea = size*10 + 5;
     this.obj.onCollide = (function(){
-      var less = 1;
-      if (this.level && this.level-less) {
+      var less = this.level - 1;
+      if (this.level === 3) { // lame solution
+        roids.levels[roids.level]--;
+        if (!roids.levels[roids.level]) roids.levelRocks();
+      }
+      if (this.level && less) {
         var x = this.obj.x,
             y = this.obj.y,
-            rock1 = new Rock(R,this.level-less,true,x,y),
-            rock2 = new Rock(R,this.level-less,true,x,y);
+            rock1 = new Rock(R,less,true,x,y),
+            rock2 = new Rock(R,less,true,x,y);
         rock1.inEdge(); rock1.randomize(260);
         rock2.inEdge(); rock2.randomize();
         roids.rocks.push(rock1,rock2);
@@ -91,8 +95,11 @@ var roids = (function(){ //
       }
       roids.R.remove(this.obj);
     }).bind(this);
+    // draw
     R.draw(this.obj);
+    // intervals
     this.intervals = [];
+    // randomize
     this.randomize = function(range){
       range = range || 180;
       this.intervals.push(setInterval((function(obj){
@@ -107,6 +114,7 @@ var roids = (function(){ //
         };
      })(this),35));
     };
+    // updateColliders
     this.updateColliders = function(){
       for (var i in roids.rocks){
         var id = roids.rocks[i].id;
@@ -125,6 +133,20 @@ var roids = (function(){ //
       }
     },t);
   }
+  var levels = [],
+      level = -1;
+  function levelRocks(){
+    this.level++;
+    this.levels.push(7);
+    for (var i = 0; i < 7; i++){
+      this.rocks.push(new Rock(this.R,3,true));
+      var l = this.rocks.length-1;
+      this.rocks[l].inEdge();
+      this.rocks[l].randomize();
+      this.hero.obj.addCollider(this.rocks[l].obj);
+    }
+    updateRockColliders();
+  }
   /* The start function
    * "Where everything begins"
    * The R argument will decide if we'll work with canvas or css
@@ -134,16 +156,7 @@ var roids = (function(){ //
     this.R = R; // this should do the reference to the render class
     this.R.start(); // setting the renderer
     this.hero = new Ship(R); // or this.Ship
-    setInterval(function(){
-      for (var i = 0; i < 3; i++){
-        this.rocks.push(new Rock(R,3,true));
-        var l = this.rocks.length-1;
-        this.rocks[l].inEdge();
-        this.rocks[l].randomize();
-        this.hero.obj.addCollider(this.rocks[l].obj);
-      }
-      updateRockColliders();
-    }.bind(this),11000);
+    this.levelRocks();
     // keyboarding!!!
     var keys = {
       37:null, 65:null,
@@ -176,6 +189,9 @@ var roids = (function(){ //
     R: null, // here will be stored the rendering method
     hero: null, // our hero (Ship object)
     rocks: [], // the asteroids
-    start: start // Go go go!
+    start: start, // Go go go!
+    levels: levels,
+    level: level,
+    levelRocks: levelRocks
   };
 }());
