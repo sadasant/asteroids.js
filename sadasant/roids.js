@@ -14,9 +14,9 @@
 var roids = (function(){ //
   // All this codes are just for pre-defining the object
   // so here be hidden vars and methods
-  var started = "You've started roids.js",
-      ids = 0;
-  
+  var started = "You've started roids.js";
+  var ids = 0;
+  /* Sort-of-inheritance */
   function fork(from,to){
     for (var i in from){
       if (from.hasOwnProperty(i)) {
@@ -25,9 +25,7 @@ var roids = (function(){ //
     }
   }
   /* MOTHER */
-  var Obj = function(){
-    
-  };
+  var Obj = function(){};
   Obj.prototype = {
     turn: function(to){
       var rad = to*(Math.PI/180);
@@ -45,19 +43,29 @@ var roids = (function(){ //
       this.obj.rotateInEdge = true;
     }
   };
+  /* SONS */
   /* The Ship class. */
   function Ship(R){
     if (!R) return;
     this.id = (ids++).toString();
     fork(Obj.prototype,this); // FORKING
-    var fill = "rgba(150, 255, 0, 0.3)",
-      stroke = "rgba(150, 255, 0, 1  )";
+    var fill = "rgba(150, 255, 0, 0.3)";
+    var stroke = "rgba(150, 255, 0, 1  )";
     this.obj = new R.Triangle(R.center.x,R.center.y,null,fill,stroke);
     this.obj.infiniteScope = true;
+    //this.inEdge();
     R.draw(this.obj);
     this.obj.onCollide = (function(){
       roids.R.remove(this.obj);
     }).bind(this);
+    this.shot = null;
+    this.shoot = function(){
+      var x = this.obj.x;
+      var y = this.obj.y;
+      this.shot = new roids.R.Circle(x,y+5,3,this.fill,this.stroke);
+      console.debug(this.shot);
+      roids.R.draw(this.shot);
+    };
   }
   /* The Rock class */
   function Rock(R,size,random,x,y){
@@ -82,12 +90,12 @@ var roids = (function(){ //
         if (!roids.levels[roids.level]) roids.levelRocks();
       }
       if (this.level && less) {
-        var x = this.obj.x,
-            y = this.obj.y,
-            rock1 = new Rock(R,less,true,x,y),
-            rock2 = new Rock(R,less,true,x,y);
-        rock1.inEdge(); rock1.randomize(260);
-        rock2.inEdge(); rock2.randomize();
+        var x = this.obj.x;
+        var y = this.obj.y;
+        var rock1 = new Rock(R,less,true,x,y);
+        var rock2 = new Rock(R,less,true,x,y);
+        rock1.inEdge(); rock1.randomize(roids.level);
+        rock2.inEdge(); rock2.randomize(roids.level);
         roids.rocks.push(rock1,rock2);
         roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-1].obj);
         roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-2].obj);
@@ -100,17 +108,17 @@ var roids = (function(){ //
     // intervals
     this.intervals = [];
     // randomize
-    this.randomize = function(range){
-      range = range || 180;
+    this.randomize = function(acc){
+      acc = acc || 0;
       this.intervals.push(setInterval((function(obj){
-        var init = range * Math.random(),
+        var init = 180 * Math.random(),
           rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1),
-          accel = Math.ceil(range*Math.random())/100;
+          accel = Math.ceil(180*Math.random())/100;
         obj.turn(init);
         obj.accelerator(accel);
         return function(){
           obj.turn(rotate);
-          obj.accelerator(accel/100);
+          obj.accelerator(accel/100 + acc/50); // important
         };
      })(this),35));
     };
@@ -133,8 +141,8 @@ var roids = (function(){ //
       }
     },t);
   }
-  var levels = [],
-      level = -1;
+  var levels = [];
+  var level = -1;
   function levelRocks(){
     this.level++;
     this.levels.push(7);
@@ -162,7 +170,8 @@ var roids = (function(){ //
       37:null, 65:null,
       38:null, 87:null,
       39:null, 68:null,
-      40:null, 83:null
+      40:null, 83:null,
+      32:null
     };
     document.addEventListener("keydown",function (e) {
       var i = 0, key = e.charCode || e.keyCode;
@@ -171,11 +180,12 @@ var roids = (function(){ //
       if (keys[39] || keys[68]) { roids.hero.turn(10); i++; }
       if (keys[38] || keys[87]) { roids.hero.accelerator(); i++; }
       if (keys[40] || keys[83]) { roids.hero.brake(); i++; }
+      if (keys[32]) { roids.hero.shoot(); i++; keys[32] = null; }
       if (i) return e.preventDefault();
     },true);
     document.addEventListener("keyup",function (e) {
       var key = e.charCode || e.keyCode;
-      if (keys[key]){
+      if (keys[key]) {
         keys[key] = null;
         return e.preventDefault();
       }

@@ -8,11 +8,11 @@
  
 var canvas = (function(){ //
   /* PRIVATE VARS */
-  var started = "You've started canvas.js",
-      _drawStack = {},
-      ids = 0,
-      removed = [],
-      apply_draw = null;
+  var started = "You've started canvas.js";
+  var _drawStack = {};
+  var ids = 0;
+  var removed = [];
+  var apply_draw = null;
   /* PRIVATE METHODS */
   getWindowSize = function() {
     var winW = 630, winH = 460;
@@ -33,8 +33,8 @@ var canvas = (function(){ //
     return {w:winW,h:winH};
   };
   function drawStack(){
-    var can = canvas.can,
-        con = canvas.con;
+    var can = canvas.can;
+    var con = canvas.con;
     if (canvas.clear) {
       canvas.draw(new canvas.Rect(0, 0, can.width, can.height, this.clear),1);
       canvas.clear = null;
@@ -139,6 +139,48 @@ var canvas = (function(){ //
       con.fillRect(this.x, this.y, this.width, this.height);
     };
   }
+  function Circle(x,y,r,fill,stroke){
+    fork(F.prototype,this); // FORKING
+    this.id = (ids++).toString();
+    this.x = x || 0;
+    this.y = y || 0;
+    this.r = r || 10;
+    this.fill = fill || "rgba(255, 255, 255, 0.3)";
+    this.stroke = stroke || "rgba(255, 255, 255, 1)";
+    this.moves = [];
+    this.rotation = 0;
+    this.speed = {x:0,y:0};
+    /* behavior variables */
+    this.infiniteScope = null;
+    /* Lame colliders */
+    this.colliders = [];
+    /* draw method */
+    this.draw = function(can,con){
+      // if out of space
+      if (this.infiniteScope) this.foreverInScope(can,con);
+      // add speed
+      if (this.speed.x || this.speed.y) this.repos();
+      con.translate(this.x,this.y);
+      // rotate
+      if (this.rotation) con.rotate(this.rotation);
+      // collide
+      if (this.colliders.length) this.collide();
+      // make internal movements
+      if (typeof(this.moves[0]) === "function") {
+        this.moves[0].call(this,con);
+        this.moves.shift();
+      }
+      // draw
+      con.translate(this.x,this.y);
+      con.fillStyle = this.fill;
+      con.strokeStyle = this.stroke;
+      con.beginPath();
+      con.arc(0, 0, this.r, 0, Math.PI * 2);
+      con.closePath();
+      con.stroke();
+      con.fill();
+    };
+  }
   function Path(x,y,v,fill,stroke){
     fork(F.prototype,this); // FORKING
     this.id = (ids++).toString();
@@ -214,7 +256,8 @@ var canvas = (function(){ //
     remove: remove,
     Path: Path,
     Rect: Rect,
-    Triangle: Triangle
+    Triangle: Triangle,
+    Circle: Circle
   };
 }());
  
