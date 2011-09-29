@@ -49,22 +49,37 @@ var roids = (function(){ //
     if (!R) return;
     this.id = (ids++).toString();
     fork(Obj.prototype,this); // FORKING
-    var fill = "rgba(150, 255, 0, 0.3)";
-    var stroke = "rgba(150, 255, 0, 1  )";
-    this.obj = new R.Triangle(R.center.x,R.center.y,null,fill,stroke);
+    this.fill = "rgba(150, 255, 0, 0.3)";
+    this.stroke = "rgba(150, 255, 0, 1  )";
+    this.obj = new R.Triangle(R.center.x,R.center.y,null,this.fill,this.stroke);
     this.obj.infiniteScope = true;
     //this.inEdge();
     R.draw(this.obj);
     this.obj.onCollide = (function(){
       roids.R.remove(this.obj);
     }).bind(this);
-    this.shot = null;
+    this.shots = [];
     this.shoot = function(){
       var x = this.obj.x;
       var y = this.obj.y;
-      this.shot = new roids.R.Circle(x,y+5,3,this.fill,this.stroke);
-      console.debug(this.shot);
-      roids.R.draw(this.shot);
+      var len = this.shots.length;
+      shot = new roids.R.Circle(x,y,1,this.fill,this.stroke);
+      shot.onCollide = function(obj){
+        obj.onCollide();
+        roids.R.remove(roids.hero.shots[len]);
+        roids.hero.shots[len] = null;
+      };
+      shot.infiniteScope = true;
+      shot.rotation = this.obj.rotation;
+      shot.run(5);
+      roids.R.draw(shot);
+      this.shots.push(shot);
+      setTimeout(function(){
+        roids.hero.shots[len].addCollider(roids.hero.obj);
+      },500);
+      for (var i in roids.rocks){
+        roids.hero.shots[len].addCollider(roids.rocks[i].obj);
+      }
     };
   }
   /* The Rock class */

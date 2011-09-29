@@ -118,7 +118,7 @@ var canvas = (function(){ //
           if (removed.indexOf(this.colliders[i].id) !== -1) { // lame solution
             delete this.colliders[i];
           } else {
-            this.onCollide();
+            this.onCollide(this.colliders[i]);
           }
         }
       }
@@ -171,11 +171,10 @@ var canvas = (function(){ //
         this.moves.shift();
       }
       // draw
-      con.translate(this.x,this.y);
       con.fillStyle = this.fill;
       con.strokeStyle = this.stroke;
       con.beginPath();
-      con.arc(0, 0, this.r, 0, Math.PI * 2);
+      con.arc(0,0, this.r, 0, Math.PI * 2);
       con.closePath();
       con.stroke();
       con.fill();
