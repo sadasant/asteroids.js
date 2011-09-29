@@ -71,7 +71,7 @@ var roids = (function(){ //
       };
       shot.infiniteScope = true;
       shot.rotation = this.obj.rotation;
-      shot.run(5);
+      shot.run(11);
       roids.R.draw(shot);
       this.shots.push(shot);
       setTimeout(function(){
