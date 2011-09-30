@@ -50,6 +50,7 @@ var canvas = (function(){ //
     _drawStack[obj.id] = obj;
   }
   function remove(obj){
+    if (!obj) return;
     removed.push(obj.id);
     delete _drawStack[obj.id];
   }
@@ -112,6 +113,7 @@ var canvas = (function(){ //
     collideArea: 15,
     collide: function(){
       for (var i in this.colliders) {
+        if (!this.colliders[i]) continue;
         var diffx = Math.abs(this.colliders[i].x - this.x),
             diffy = Math.abs(this.colliders[i].y - this.y);
         if (diffx < this.collideArea && diffy < this.collideArea) {

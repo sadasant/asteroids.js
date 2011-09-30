@@ -18,7 +18,7 @@ var roids = (function(){ //
   var ids = 0;
   /* Sort-of-inheritance */
   function fork(from,to){
-    for (var i in from){
+    for (var i in from) {
       if (from.hasOwnProperty(i)) {
         to[i] = from[i];
       }
@@ -48,6 +48,7 @@ var roids = (function(){ //
   function Ship(R){
     if (!R) return;
     this.id = (ids++).toString();
+    this.alive = true;
     fork(Obj.prototype,this); // FORKING
     this.fill = "rgba(150, 255, 0, 0.3)";
     this.stroke = "rgba(150, 255, 0, 1  )";
@@ -57,9 +58,11 @@ var roids = (function(){ //
     R.draw(this.obj);
     this.obj.onCollide = (function(){
       roids.R.remove(this.obj);
+      roids.hero.alive = false;
     }).bind(this);
     this.shots = [];
     this.shoot = function(){
+      if (!this.alive) return;
       var x = this.obj.x;
       var y = this.obj.y;
       var len = this.shots.length;
@@ -75,9 +78,11 @@ var roids = (function(){ //
       roids.R.draw(shot);
       this.shots.push(shot);
       setTimeout(function(){
-        roids.hero.shots[len].addCollider(roids.hero.obj);
+        if (roids.hero.shots[len]) {
+          roids.hero.shots[len].addCollider(roids.hero.obj);
+        }
       },500);
-      for (var i in roids.rocks){
+      for (var i in roids.rocks) {
         roids.hero.shots[len].addCollider(roids.rocks[i].obj);
       }
     };
@@ -112,8 +117,18 @@ var roids = (function(){ //
         rock1.inEdge(); rock1.randomize(roids.level);
         rock2.inEdge(); rock2.randomize(roids.level);
         roids.rocks.push(rock1,rock2);
-        roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-1].obj);
-        roids.hero.obj.addCollider(roids.rocks[roids.rocks.length-2].obj);
+        roids.hero.obj.addCollider(rock1.obj);
+        roids.hero.obj.addCollider(rock2.obj);
+        setTimeout(function shotSensitive(rock1,rock2){
+          for (var i in roids.hero.shots) {
+            if (roids.hero.shots[i] !== null) {
+              rock1.obj.addCollider(roids.hero.shots[i]);
+              rock2.obj.addCollider(roids.hero.shots[i]);
+              roids.hero.shots[i].addCollider(rock1.obj);
+              roids.hero.shots[i].addCollider(rock2.obj);
+            }
+          }
+        }.bind(null,rock1,rock2),300);
         updateRockColliders(1500);
       }
       roids.R.remove(this.obj);
@@ -126,9 +141,9 @@ var roids = (function(){ //
     this.randomize = function(acc){
       acc = acc || 0;
       this.intervals.push(setInterval((function(obj){
-        var init = 180 * Math.random(),
-          rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1),
-          accel = Math.ceil(180*Math.random())/100;
+        var init = 180 * Math.random();
+        var rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1);
+        var accel = Math.ceil(180*Math.random())/100;
         obj.turn(init);
         obj.accelerator(accel);
         return function(){
@@ -141,7 +156,7 @@ var roids = (function(){ //
     this.updateColliders = function(){
       for (var i in roids.rocks){
         var id = roids.rocks[i].id;
-        if (id !== this.id && this.colliders.indexOf(id) === -1){
+        if (id !== this.id && this.colliders.indexOf(id) === -1) {
           this.colliders.push(id);
           this.obj.addCollider(roids.rocks[i].obj);
         }
@@ -151,7 +166,7 @@ var roids = (function(){ //
   function updateRockColliders(t){
     t = t || 500;
     setTimeout(function(){
-      for (var i in roids.rocks){
+      for (var i in roids.rocks) {
         roids.rocks[i].updateColliders();
       }
     },t);
@@ -160,13 +175,20 @@ var roids = (function(){ //
   var level = -1;
   function levelRocks(){
     this.level++;
+    document.getElementById("level").innerHTML = this.level;
     this.levels.push(7);
-    for (var i = 0; i < 7; i++){
+    for (var i = 0; i < 7; i++) {
       this.rocks.push(new Rock(this.R,3,true));
       var l = this.rocks.length-1;
       this.rocks[l].inEdge();
       this.rocks[l].randomize();
       this.hero.obj.addCollider(this.rocks[l].obj);
+      for (var s in roids.hero.shots) {
+        if (roids.hero.shots[s] !== null) {
+          this.rocks[l].obj.addCollider(roids.hero.shots[s]);
+          roids.hero.shots[s].addCollider(this.rocks[l].obj);
+        }
+      }
     }
     updateRockColliders();
   }
@@ -188,7 +210,7 @@ var roids = (function(){ //
       40:null, 83:null,
       32:null
     };
-    document.addEventListener("keydown",function (e) {
+    document.addEventListener("keydown",function (e){
       var i = 0, key = e.charCode || e.keyCode;
       if (keys[key] === null) keys[key] = true;
       if (keys[37] || keys[65]) { roids.hero.turn(-10); i++; }
