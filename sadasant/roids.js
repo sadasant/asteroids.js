@@ -124,6 +124,7 @@ var roids = (function newRoids(){ //
     var posx = x ||(random?Math.floor(R.can.width*Math.random()) :R.center.x);
     var posy = y ||(random?Math.floor(R.can.height*Math.random()):R.center.y);
     this.obj = new R.Path(posx,posy,path,fill,stroke);
+    this.obj.maxSpeed = {x:7, y:7};
     this.obj.infiniteScope = true;
     // onCollide
     this.obj.collideArea = size*10 + 5;
