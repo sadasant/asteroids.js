@@ -89,7 +89,7 @@ var roids = (function newRoids(){ //
       var len = this.shots.length;
       var shot = new roids.R.Circle(x,y,1,this.fill,this.stroke);
       shot.onCollide = function(obj){
-        if (obj !== undefined) obj.onCollide();
+        if (obj !== undefined && typeof obj.onCollide == 'function') obj.onCollide();
         roids.R.remove(roids.hero.shots[len]);
         roids.hero.shots[len] = null;
       };
