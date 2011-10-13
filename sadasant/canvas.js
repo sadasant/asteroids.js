@@ -73,7 +73,6 @@ var canvas = (function newCanvas(){ //
       if (this.y < -10)  this.y += can.height;
     },
     //rotateInEdge: false,
-    maxSpeed: {x:10, y:10},
     run: function(much,maxSpeed){
       if (maxSpeed) {
         this.maxSpeed.x = maxSpeed;
@@ -142,6 +141,7 @@ var canvas = (function newCanvas(){ //
     this.width = width;
     this.height = height;
     this.fill = fill || "rgba(0, 0, 0, 0.2)";
+    this.maxSpeed = {x:10, y:10};
     this.draw = function(can,con){
       con.fillStyle = this.fill;
       con.fillRect(this.x, this.y, this.width, this.height);
@@ -158,6 +158,7 @@ var canvas = (function newCanvas(){ //
     this.moves = [];
     this.rotation = 0;
     this.speed = {x:0,y:0};
+    this.maxSpeed = {x:10, y:10};
     /* behavior variables */
     this.infiniteScope = null;
     /* Lame colliders */
@@ -199,6 +200,7 @@ var canvas = (function newCanvas(){ //
     this.moves = [];
     this.rotation = 0;
     this.speed = {x:0,y:0};
+    this.maxSpeed = {x:10, y:10};
     /* behavior variables */
     this.infiniteScope = null;
     /* Lame colliders */
