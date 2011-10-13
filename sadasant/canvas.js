@@ -74,7 +74,11 @@ var canvas = (function newCanvas(){ //
     },
     //rotateInEdge: false,
     maxSpeed: {x:10, y:10},
-    run: function(much){
+    run: function(much,maxSpeed){
+      if (maxSpeed) {
+        this.maxSpeed.x = maxSpeed;
+        this.maxSpeed.y = maxSpeed;
+      }
       much = much;
       if (this.rotateInEdge) {
         var a = this.rotation;

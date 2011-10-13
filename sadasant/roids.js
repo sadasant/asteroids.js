@@ -89,13 +89,14 @@ var roids = (function newRoids(){ //
       var len = this.shots.length;
       var shot = new roids.R.Circle(x,y,1,this.fill,this.stroke);
       shot.onCollide = function(obj){
-        obj.onCollide();
+        if (obj !== undefined) obj.onCollide();
         roids.R.remove(roids.hero.shots[len]);
         roids.hero.shots[len] = null;
       };
+      setTimeout(shot.onCollide,roids.level*1000);
       shot.infiniteScope = true;
       shot.rotation = this.obj.rotation;
-      shot.run(11);
+      shot.run(11, 11);
       roids.R.draw(shot);
       this.shots.push(shot);
       setTimeout(function(){
