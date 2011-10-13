@@ -96,7 +96,7 @@ var roids = (function newRoids(){ //
       setTimeout(shot.onCollide,roids.level*1000);
       shot.infiniteScope = true;
       shot.rotation = this.obj.rotation;
-      shot.run(11, 11);
+      shot.run(13, 13);
       roids.R.draw(shot);
       this.shots.push(shot);
       setTimeout(function(){
