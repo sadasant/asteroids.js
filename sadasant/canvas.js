@@ -6,7 +6,7 @@
  *
  */
  
-var canvas = (function(){ //
+var canvas = (function newCanvas(){ //
   /* PRIVATE VARS */
   var started = "You've started canvas.js";
   var _drawStack = {};
@@ -35,11 +35,13 @@ var canvas = (function(){ //
   function drawStack(){
     var can = canvas.can;
     var con = canvas.con;
+    if (!can || !con) return;
     if (canvas.clear) {
       canvas.draw(new canvas.Rect(0, 0, can.width, can.height, this.clear),1);
       canvas.clear = null;
     }
     for (var i in _drawStack){
+      if (!_drawStack[i]) continue;
       con.save();
       _drawStack[i].draw(can,con);
       con.restore();
@@ -51,8 +53,9 @@ var canvas = (function(){ //
   }
   function remove(obj){
     if (!obj) return;
+    console.debug(_drawStack);
     removed.push(obj.id);
-    delete _drawStack[obj.id];
+    _drawStack[obj.id] = null;
   }
   function fork(from,to){
     for (var i in from){
@@ -70,14 +73,14 @@ var canvas = (function(){ //
       if (this.y > can.height) this.y -= can.height;
       if (this.y < -10)  this.y += can.height;
     },
-    rotateInEdge: false,
+    //rotateInEdge: false,
     maxSpeed: {x:10, y:10},
     run: function(much){
-      much = much || 1;
+      much = much;
       if (this.rotateInEdge) {
-        var a = this.rotation,
-            x = (0 * Math.cos(a)) - (much * Math.sin(a));
-            y = (much * Math.cos(a)) + (0 * Math.sin(a));
+        var a = this.rotation;
+        var x = (0 * Math.cos(a)) - (much * Math.sin(a));
+        var y = (much * Math.cos(a)) + (0 * Math.sin(a));
         this.speed.x += x;
         this.speed.y += y;
       } else {
@@ -130,7 +133,7 @@ var canvas = (function(){ //
   /* SONS */
   function Rect(x,y,width,height,fill){
     /* Todo: put default values */
-    this.id = (ids++).toString();
+    this.id = (++ids).toString();
     this.x = x;
     this.y = y;
     this.width = width;
@@ -143,7 +146,8 @@ var canvas = (function(){ //
   }
   function Circle(x,y,r,fill,stroke){
     fork(F.prototype,this); // FORKING
-    this.id = (ids++).toString();
+    this.id = (++ids).toString();
+    console.debug(this.id);
     this.x = x || 0;
     this.y = y || 0;
     this.r = r || 10;
@@ -184,7 +188,7 @@ var canvas = (function(){ //
   }
   function Path(x,y,v,fill,stroke){
     fork(F.prototype,this); // FORKING
-    this.id = (ids++).toString();
+    this.id = (++ids).toString();
     this.x = x || 0;
     this.y = y || 0;
     this.v = v || [];
@@ -227,7 +231,6 @@ var canvas = (function(){ //
     };
   }
   function Triangle(x,y,v,fill,stroke){
-    this.id = (ids++).toString();
     x = x || 0;
     y = y || 0;
     v = v || [[0,-10],[-10,0],[10,0]];
@@ -236,15 +239,20 @@ var canvas = (function(){ //
     return new Path(x,y,v,fill,stroke);
   }
   // GO GO GO!!!
-  function start(id,d,width,height){
-    this.can = document.getElementById(id || "canvas");
+  function start(id,d,width,height,frame){
+    _drawStack = {};
+    ids = 0;
+    removed = [];
+    apply_draw = null;
+    this.can = this.can || document.getElementById(id || "canvas");
     var win = getWindowSize();
     this.can.width = width || win.w;
     this.can.height = height || win.h;
     this.center = {x:win.w/2,y:win.h/2};
-    this.con = this.can.getContext(d || "2d");
+    this.con = this.con || this.can.getContext(d || "2d");
     this.clear = "rgba(0, 0, 0, 0.02)";
-    this.interval = setInterval(drawStack,33); // should be between 30 and 35
+    if (this.interval) clearInterval(this.interval);
+    this.interval = setInterval(drawStack,this.frame);
     if (console && console.debug) console.debug(started);
     return started;
   }
@@ -258,7 +266,8 @@ var canvas = (function(){ //
     Path: Path,
     Rect: Rect,
     Triangle: Triangle,
-    Circle: Circle
+    Circle: Circle,
+    frame: 33
   };
 }());
  

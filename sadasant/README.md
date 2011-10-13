@@ -15,8 +15,9 @@ rendering options we're going to make (css and canvas), that core should be
 * Asteroids.
 * The colliding "system".
 * Dividing asteroids.
-* "Sort of levels", Every time the 7 big rocks die, 7 more appear.
+* New rocks as the level counter says.
 * Bullets.
+* Revive.
 
 **What should be done soon:**
 
@@ -25,7 +26,7 @@ rendering options we're going to make (css and canvas), that core should be
 **Mini-examples:**
 
 * [Rotating a triangle with canvas](http://jsfiddle.net/sadasant/3sBRh/4/)
-* Last update, live: <http://fiddle.jshell.net/sadasant/3sBRh/8/show/light/>
+* Last update, live: <http://fiddle.jshell.net/sadasant/3sBRh/9/show/light/>
 
 **Notes:**
 
