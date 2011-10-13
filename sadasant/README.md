@@ -26,7 +26,7 @@ rendering options we're going to make (css and canvas), that core should be
 **Mini-examples:**
 
 * [Rotating a triangle with canvas](http://jsfiddle.net/sadasant/3sBRh/4/)
-* Last update, live: <http://fiddle.jshell.net/sadasant/3sBRh/9/show/light/>
+* Last update, live: <https://bitly.com/-asteroidsjs>
 
 **Notes:**
 
