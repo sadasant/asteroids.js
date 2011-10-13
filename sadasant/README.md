@@ -18,6 +18,7 @@ rendering options we're going to make (css and canvas), that core should be
 * New rocks as the level counter says.
 * Bullets.
 * Revive.
+* Bullets last as the level says.
 
 **What should be done soon:**
 
