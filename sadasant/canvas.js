@@ -53,7 +53,6 @@ var canvas = (function newCanvas(){ //
   }
   function remove(obj){
     if (!obj) return;
-    console.debug(_drawStack);
     removed.push(obj.id);
     _drawStack[obj.id] = null;
   }
@@ -147,7 +146,6 @@ var canvas = (function newCanvas(){ //
   function Circle(x,y,r,fill,stroke){
     fork(F.prototype,this); // FORKING
     this.id = (++ids).toString();
-    console.debug(this.id);
     this.x = x || 0;
     this.y = y || 0;
     this.r = r || 10;
