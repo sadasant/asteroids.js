@@ -1,49 +1,49 @@
 /* canvas.js
  * By Daniel R. (sadasant.com)
- * for #jsve (groups.google.com/group/jsv)
- *
- * roids.js's objects rendered with canvas
- *
+ * License: http://opensource.org/licenses/mit-license.php
  */
- 
+
 var canvas = (function newCanvas(){ //
   /* PRIVATE VARS */
-  var started = "You've started canvas.js";
-  var _drawStack = {};
-  var ids = 0;
-  var removed = [];
-  var apply_draw = null;
+  var started    = "You've started canvas.js"
+    , _drawStack = {}
+    , ids        = 0
+    , removed    = []
+    , apply_draw = null
+    , doc        = document
+    , win        = window
+    , can
+    , con
   /* PRIVATE METHODS */
   getWindowSize = function() {
-    var winW = 630, winH = 460;
-    if (document.body && document.body.offsetWidth) {
-     winW = document.body.offsetWidth;
-     winH = document.body.offsetHeight;
+    var winW = 630
+      , winH = 460;
+    if (doc.body && doc.body.offsetWidth) {
+     winW = doc.body.offsetWidth;
+     winH = doc.body.offsetHeight;
     }
-    if (document.compatMode=='CSS1Compat' &&
-        document.documentElement &&
-        document.documentElement.offsetWidth ) {
-     winW = document.documentElement.offsetWidth;
-     winH = document.documentElement.offsetHeight;
+    if (doc.compatMode=='CSS1Compat' &&
+        doc.documentElement &&
+        doc.documentElement.offsetWidth) {
+     winW = doc.documentElement.offsetWidth;
+     winH = doc.documentElement.offsetHeight;
     }
-    if (window.innerWidth && window.innerHeight) {
-     winW = window.innerWidth;
-     winH = window.innerHeight;
+    if (win.innerWidth && win.innerHeight) {
+     winW = win.innerWidth;
+     winH = win.innerHeight;
     }
     return {w:winW,h:winH};
   };
   function drawStack(){
-    var can = canvas.can;
-    var con = canvas.con;
     if (!can || !con) return;
     if (canvas.clear) {
       canvas.draw(new canvas.Rect(0, 0, can.width, can.height, this.clear),1);
       canvas.clear = null;
     }
-    for (var i in _drawStack){
-      if (!_drawStack[i]) continue;
+    for (var k in _drawStack){
+      if (!_drawStack[k]) continue;
       con.save();
-      _drawStack[i].draw(can,con);
+      _drawStack[k].draw();
       con.restore();
     }
   }
@@ -53,24 +53,28 @@ var canvas = (function newCanvas(){ //
   }
   function remove(obj){
     if (!obj) return;
-    removed.push(obj.id);
+    removed[removed.length] = obj.id;
     _drawStack[obj.id] = null;
   }
   function fork(from,to){
-    for (var i in from){
-      if (from.hasOwnProperty(i)) {
-        to[i] = from[i];
+    for (var k in from){
+      if (from.hasOwnProperty(k)) {
+        to[k] = from[k];
       }
     }
   }
   /* MOTHERS */
   function F() {}
   F.prototype = {
-    foreverInScope: function(can,con){
+    foreverInScope: function(){
       if (this.x > can.width-10)  this.x -= can.width;
       if (this.x < -10)  this.x += can.width-10;
       if (this.y > can.height) this.y -= can.height;
       if (this.y < -10)  this.y += can.height;
+    },
+    // degrees 2 rad
+    rotateTo: function (deg) {
+      this.rotation = deg * Math.PI/180
     },
     //rotateInEdge: false,
     run: function(much,maxSpeed){
@@ -80,9 +84,9 @@ var canvas = (function newCanvas(){ //
       }
       much = much;
       if (this.rotateInEdge) {
-        var a = this.rotation;
-        var x = (0 * Math.cos(a)) - (much * Math.sin(a));
-        var y = (much * Math.cos(a)) + (0 * Math.sin(a));
+        var a = this.rotation
+          , x = (0 * Math.cos(a)) - (much * Math.sin(a))
+          , y = (much * Math.cos(a)) + (0 * Math.sin(a))
         this.speed.x += x;
         this.speed.y += y;
       } else {
@@ -109,7 +113,7 @@ var canvas = (function newCanvas(){ //
     },
     // lame collide
     addCollider: function(obj){
-      this.colliders.push(obj);
+      this.colliders[this.colliders.length] = obj;
     },
     onCollide: function(){
       this.fill = "rgba(255, 0, 0, 0.3)";
@@ -117,21 +121,22 @@ var canvas = (function newCanvas(){ //
     },
     collideArea: 15,
     collide: function(){
-      for (var i in this.colliders) {
-        if (!this.colliders[i]) continue;
-        var diffx = Math.abs(this.colliders[i].x - this.x),
-            diffy = Math.abs(this.colliders[i].y - this.y);
+      var col = this.colliders
+      for (var i = 0; i < col.length; i++) {
+        if (!col[i]) continue;
+        var diffx = Math.abs(col[i].x - this.x),
+            diffy = Math.abs(col[i].y - this.y);
         if (diffx < this.collideArea && diffy < this.collideArea) {
-          if (removed.indexOf(this.colliders[i].id) !== -1) { // lame solution
+          if (removed.indexOf(col[i].id) !== -1) { // lame solution
             delete this.colliders[i];
           } else {
-            this.onCollide(this.colliders[i]);
+            this.onCollide(col[i]);
           }
         }
       }
     }
   };
-  
+
   /* SONS */
   function Rect(x,y,width,height,fill){
     /* Todo: put default values */
@@ -142,7 +147,7 @@ var canvas = (function newCanvas(){ //
     this.height = height;
     this.fill = fill || "rgba(0, 0, 0, 0.2)";
     this.maxSpeed = {x:10, y:10};
-    this.draw = function(can,con){
+    this.draw = function(){
       con.fillStyle = this.fill;
       con.fillRect(this.x, this.y, this.width, this.height);
     };
@@ -164,9 +169,9 @@ var canvas = (function newCanvas(){ //
     /* Lame colliders */
     this.colliders = [];
     /* draw method */
-    this.draw = function(can,con){
+    this.draw = function(){
       // if out of space
-      if (this.infiniteScope) this.foreverInScope(can,con);
+      if (this.infiniteScope) this.foreverInScope();
       // add speed
       if (this.speed.x || this.speed.y) this.repos();
       con.translate(this.x,this.y);
@@ -175,8 +180,8 @@ var canvas = (function newCanvas(){ //
       // collide
       if (this.colliders.length) this.collide();
       // make internal movements
-      if (typeof(this.moves[0]) === "function") {
-        this.moves[0].call(this,con);
+      if (typeof this.moves[0] === "function") {
+        this.moves[0].call(this);
         this.moves.shift();
       }
       // draw
@@ -206,9 +211,9 @@ var canvas = (function newCanvas(){ //
     /* Lame colliders */
     this.colliders = [];
     /* draw method */
-    this.draw = function(can,con){
+    this.draw = function(){
       // if out of space
-      if (this.infiniteScope) this.foreverInScope(can,con);
+      if (this.infiniteScope) this.foreverInScope();
       // add speed
       if (this.speed.x || this.speed.y) this.repos();
       con.translate(this.x,this.y);
@@ -217,17 +222,17 @@ var canvas = (function newCanvas(){ //
       // collide
       if (this.colliders.length) this.collide();
       // make internal movements
-      if (typeof(this.moves[0]) === "function") {
-        this.moves[0].call(this,con);
+      if (typeof this.moves[0] === "function") {
+        this.moves[0].call(this);
         this.moves.shift();
       }
       // draw
       con.fillStyle = this.fill;
       con.strokeStyle = this.stroke;
       con.beginPath();
-      for (var v in this.v){
-        if (!v) con.moveTo(this.v[v][0],this.v[v][1]);
-        else con.lineTo(this.v[v][0],this.v[v][1]);
+      for (var i = 0; i < this.v.length; i++){
+        if (!i) con.moveTo(this.v[i][0],this.v[i][1]);
+        else con.lineTo(this.v[i][0],this.v[i][1]);
       }
       con.closePath();
       con.stroke();
@@ -243,18 +248,18 @@ var canvas = (function newCanvas(){ //
     return new Path(x,y,v,fill,stroke);
   }
   // GO GO GO!!!
-  function start(id,d,width,height,frame){
-    _drawStack = {};
-    ids = 0;
-    removed = [];
-    apply_draw = null;
-    this.can = this.can || document.getElementById(id || "canvas");
-    var win = getWindowSize();
-    this.can.width = width || win.w;
-    this.can.height = height || win.h;
+  function start (id, d, width, height, frame){
+    _drawStack = {}
+    ids         = 0
+    removed     = []
+    apply_draw  = null
+    this.can    = can = this.can || doc.getElementById(id || "canvas");
+    this.con    = con = this.con || can.getContext(d || "2d");
+    var win     = getWindowSize();
+    can.width   = width || win.w;
+    can.height  = height || win.h;
     this.center = {x:win.w/2,y:win.h/2};
-    this.con = this.con || this.can.getContext(d || "2d");
-    this.clear = "rgba(0, 0, 0, 0.02)";
+    this.clear  = "rgba(0, 0, 0, 0.02)";
     if (this.interval) clearInterval(this.interval);
     this.interval = setInterval(drawStack,this.frame);
     if (console && console.debug) console.debug(started);
@@ -274,4 +279,3 @@ var canvas = (function newCanvas(){ //
     frame: 33
   };
 }());
- 
