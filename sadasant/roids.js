@@ -1,9 +1,6 @@
 /* roids.js
  * By Daniel R. (sadasant.com)
- * for #jsve (groups.google.com/group/jsv)
- *
- * Here will be all the math stuff and objects for asteroidsjs
- *
+ * License: http://opensource.org/licenses/mit-license.php
  */
 
 /* Anonymous functions also hacked paypal.
@@ -14,13 +11,14 @@
 var roids = (function newRoids(){ //
   // All this codes are just for pre-defining the object
   // so here be hidden vars and methods
-  var started = "You've started roids.js";
-  var ids = 0;
+  var started = "You've started roids.js"
+    , ids = 0
+    , pi_180 = Math.PI/180
   /* Sort-of-inheritance */
   function fork(from,to){
-    for (var i in from) {
-      if (from.hasOwnProperty(i)) {
-        to[i] = from[i];
+    for (var k in from) {
+      if (from.hasOwnProperty(k)) {
+        to[k] = from[k];
       }
     }
   }
@@ -29,12 +27,12 @@ var roids = (function newRoids(){ //
   Obj.prototype = {
     intervals: { rotate:null, run:null },
     clearIntervals: function(){
-      for (var i in this.intervals) {
+      for (var i = 0; i < this.intervals.length; i++) {
         clearInterval(this.intervals[i]);
       }
     },
     rotate: function(to,hold){
-      var rad = to*(Math.PI/180);
+      var rad = to*pi_180;
       if (hold) {
         clearInterval(this.intervals.rotate);
         var interval = function (){
@@ -67,10 +65,12 @@ var roids = (function newRoids(){ //
     if (!R) return;
     this.id = (ids++).toString();
     this.alive = true;
+    this.busy  = false
     fork(Obj.prototype,this); // FORKING
     this.fill = "rgba(150, 255, 0, 0.3)";
     this.stroke = "rgba(150, 255, 0, 1  )";
     this.obj = new R.Triangle(R.center.x,R.center.y,null,this.fill,this.stroke);
+    this.obj.maxSpeed = {x:2,y:2}
     this.obj.infiniteScope = true;
     //this.inEdge();
     R.draw(this.obj);
@@ -83,11 +83,11 @@ var roids = (function newRoids(){ //
     }).bind(this);
     this.shots = [];
     this.shoot = function(){
-      if (!this.alive) return;
-      var x = this.obj.x;
-      var y = this.obj.y;
-      var len = this.shots.length;
-      var shot = new roids.R.Circle(x,y,1,this.fill,this.stroke);
+      if (!this.alive || this.busy) return;
+      var x = this.obj.x
+        , y = this.obj.y
+        , len = this.shots.length
+        , shot = new roids.R.Circle(x,y,1,this.fill,this.stroke)
       shot.onCollide = function(obj){
         if (obj !== undefined && typeof obj.onCollide == 'function') obj.onCollide();
         roids.R.remove(roids.hero.shots[len]);
@@ -99,6 +99,10 @@ var roids = (function newRoids(){ //
       shot.run(13, 13);
       roids.R.draw(shot);
       this.shots.push(shot);
+      this.busy = true
+      setTimeout(function(){
+        roids.hero.busy = false
+      },500-roids.level*50)
       setTimeout(function(){
         if (roids.hero.shots[len]) {
           if (roids.hero.shots[len]) {
@@ -106,7 +110,7 @@ var roids = (function newRoids(){ //
           }
         }
       },500);
-      for (var i in roids.rocks) {
+      for (var i = 0; i < roids.rocks.length; i++) {
         roids.hero.shots[len].addCollider(roids.rocks[i].obj);
       }
     };
@@ -118,16 +122,16 @@ var roids = (function newRoids(){ //
     this.colliders = [];
     fork(Obj.prototype,this); // FORKING
     this.level = size || 2;
-    var path = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]];
-    var fill = "rgba(82, 163, 0, 0.3)";
-    var stroke = "rgba(82, 163, 0, 1  )";
-    var posx = x ||(random?Math.floor(R.can.width*Math.random()) :R.center.x);
-    var posy = y ||(random?Math.floor(R.can.height*Math.random()):R.center.y);
+    var path = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]]
+      , fill = "rgba(82, 163, 0, 0.3)"
+      , stroke = "rgba(82, 163, 0, 1  )"
+      , posx = x ||(random?Math.floor(R.can.width *Math.random()):R.center.x)
+      , posy = y ||(random?Math.floor(R.can.height*Math.random()):R.center.y)
     this.obj = new R.Path(posx,posy,path,fill,stroke);
     this.obj.maxSpeed = {x:7, y:7};
     this.obj.infiniteScope = true;
     // onCollide
-    this.obj.collideArea = size*10 + 5;
+    this.obj.collideArea = size*10 + 10;
     this.obj.onCollide = (function(){
       var less = this.level - 1;
       if (this.level === 3) { // lame solution
@@ -135,17 +139,17 @@ var roids = (function newRoids(){ //
         if (!roids.levels[roids.level]) roids.levelRocks();
       }
       if (this.level && less) {
-        var x = this.obj.x;
-        var y = this.obj.y;
-        var rock1 = new Rock(R,less,true,x,y);
-        var rock2 = new Rock(R,less,true,x,y);
-        rock1.inEdge(); rock1.randomize(roids.level);
-        rock2.inEdge(); rock2.randomize(roids.level);
+        var x = this.obj.x
+          , y = this.obj.y
+          , rock1 = new Rock(R,less,true,x,y)
+          , rock2 = new Rock(R,less,true,x,y)
+        rock1.inEdge(); rock1.randomize(roids.level/3);
+        rock2.inEdge(); rock2.randomize(roids.level/3);
         roids.rocks.push(rock1,rock2);
         roids.hero.obj.addCollider(rock1.obj);
         roids.hero.obj.addCollider(rock2.obj);
         setTimeout(function shotSensitive(rock1,rock2){
-          for (var i in roids.hero.shots) {
+          for (var i = 0; i < roids.hero.shots.length; i++) {
             if (roids.hero.shots[i] !== null) {
               rock1.obj.addCollider(roids.hero.shots[i]);
               rock2.obj.addCollider(roids.hero.shots[i]);
@@ -166,9 +170,9 @@ var roids = (function newRoids(){ //
     this.randomize = function(acc){
       acc = acc || 0;
       this.intervals.push(setInterval((function(obj){
-        var init = 180 * Math.random();
-        var rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1);
-        var accel = Math.ceil(180*Math.random())/100;
+        var init = 179 * Math.random()
+          , rotate = 1 + 5*Math.random()*((Math.floor(2*Math.random()))?-1:1)
+          , accel = Math.ceil(179*Math.random())/100
         obj.rotate(init);
         obj.run(accel);
         return function(){
@@ -179,7 +183,7 @@ var roids = (function newRoids(){ //
     };
     // updateColliders
     this.updateColliders = function(){
-      for (var i in roids.rocks){
+      for (var i = 0; i < roids.rocks.length; i++){
         var id = roids.rocks[i].id;
         if (id !== this.id && this.colliders.indexOf(id) === -1) {
           this.colliders.push(id);
@@ -191,15 +195,18 @@ var roids = (function newRoids(){ //
   function updateRockColliders(t){
     t = t || 500;
     setTimeout(function(){
-      for (var i in roids.rocks) {
+      for (var i = 0; i < roids.rocks.length; i++) {
         roids.rocks[i].updateColliders();
       }
     },t);
   }
-  var levels = [];
-  var level = 0;
+  var levels = []
+    , level = 0
   function levelRocks(){
     this.level++;
+    var level_speed = this.level/3
+    roids.hero.obj.maxSpeed.x += level_speed
+    roids.hero.obj.maxSpeed.y += level_speed
     var level = Math.ceil(this.level/3);
     document.getElementById("level").innerHTML = this.level-1;
     this.levels.push(level);
@@ -233,7 +240,7 @@ var roids = (function newRoids(){ //
     }
     this.hero = null; // our hero (Ship object)
     if (this.rocks) {
-      for (var i in this.rocks) {
+      for (var i = 0; i < this.rocks.length; i++) {
         this.rocks[i].clearIntervals();
       }
     }
