@@ -4,4 +4,4 @@ A little game with canvas.
 
 Canvas Library: [Ink.js](https://github.com/sadasant/Ink.js)
 
-*Licence: MIT*
+*Licence: [MIT](http://opensource.org/licenses/mit-license.php)*
