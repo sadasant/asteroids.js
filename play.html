@@ -2,16 +2,17 @@
 <html>
   <head>
     <meta charset=utf-8 />
-    <title>asteroidsjs ~ canvas</title>
+    <title>asteroidsjs</title>
     <!--[if IE]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <style>
-      article, aside, figure, footer, header, hgroup, 
+      article, aside, figure, footer, header, hgroup,
       menu, nav, section { display: block; }
       body {
         background: #000;
         overflow:hidden;
+        font:11px sans-serif;
       }
       #info {
         position:fixed;
@@ -27,19 +28,21 @@
   </head>
   <body>
     <div id="info">
-      <em><b>asteroidsjs</b> ~ canvas</em></br>
-      <a href="https://groups.google.com/group/jsve/browse_thread/thread/5c07b9e843980e7f">First training</a> with <a href="https://groups.google.com/group/jsv">jsve</a>.</br>
-      Press the arrow-keys to move.</br>
+      <em><b>asteroidsjs</b></em></br>
+        By <a href="http://sadasant.com/">Daniel R</a>.</br>
+        The source is <a href="https://github.com/sadasant/asteroidsjs/tree/master/sadasant">here</a>.</br>
+        Use the arrows to move.</br>
+        Click the space bar to shoot.</br>
       <b>Level <b id="level"></b></b>
     </div>
     <canvas id="canvas">Loading...</canvas>
   </body>
-  <script src="canvas.js"></script>
-  <script src="roids.js"></script>
   <script>
     /* SETTINGS */
     window.onload = function() {
-      roids.start(canvas);
+      asteroids.start(Ink);
     }
   </script>
+  <script type='text/javascript' src="Ink.js"></script>
+  <script type='text/javascript' src="asteroids.js"></script>
 </html>

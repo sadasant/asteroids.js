@@ -1,0 +1,15 @@
+{
+  "name": "Asteroidsjs",
+  "description": "An asteroids-like game in HTML5",
+  "version": "1.0.1",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "app": {
+    "launch": {
+      "local_path": "play.html"
+    }
+  }
+}
