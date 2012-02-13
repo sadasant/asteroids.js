@@ -1,6 +1,6 @@
 # asteroids.js
 
-A little game with canvas.
+A little asteroids-like game with canvas.
 
 Canvas Library: [Ink.js](https://github.com/sadasant/Ink.js)
 
