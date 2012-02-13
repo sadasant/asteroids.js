@@ -80,7 +80,6 @@ var asteroids = (function newRoids(){ //
     this.obj = new R.Triangle(R.center.x,R.center.y,null,this.fill,this.stroke)
     this.obj.maxSpeed = {x:2,y:2}
     this.obj.infiniteScope = true
-    //this.inEdge()
     R.draw(this.obj)
     this.obj.onCollide = (function(){
       asteroids.R.remove(this.obj)
