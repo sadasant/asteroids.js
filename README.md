@@ -1,4 +1,4 @@
-# Asteroids.js
+# asteroids.js
 
 A little game with canvas.
 
