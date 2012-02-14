@@ -115,7 +115,7 @@
   function Rock(size, random, x, y){
     this.id = (ids++).toString()
     this.colliders = []
-    Ink.fork(Obj.prototype,this) // FORKING
+    Ink.fork(Obj.prototype, this) // FORKING
     this.level = size || 2
     var path = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]]
       , fill   = "rgba(82, 163, 0, 0.3)"
@@ -133,8 +133,8 @@
         if (!--levels[level]) levelRocks()
       }
       if (this.level && less) {
-        var rock1 = new Rock(less,true, this.obj.x, this.obj.y)
-          , rock2 = new Rock(less,true, this.obj.x, this.obj.y)
+        var rock1 = new Rock(less, true, this.obj.x, this.obj.y)
+          , rock2 = new Rock(less, true, this.obj.x, this.obj.y)
         rock1.inEdge()
         rock2.inEdge()
         rock1.randomize(level/3)
@@ -178,7 +178,7 @@
     this.updateColliders = function() {
       for (var i = 0; i < rocks.length; i++){
         var id = rocks[i].id
-        if (id !== this.id && ~this.colliders.indexOf(id)) {
+        if (id !== this.id && !~this.colliders.indexOf(id)) {
           this.colliders.push(id)
           this.obj.addCollider(rocks[i].obj)
         }
