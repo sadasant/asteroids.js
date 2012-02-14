@@ -31,7 +31,7 @@
   Obj.prototype = {
       intervals : {
         rotate : null
-      , run    : null
+      , accel  : null
       }
     , clearIntervals: function() {
         for (var i = 0; i < this.intervals.length; i++) {
@@ -47,13 +47,13 @@
           this.obj.rotation += rad
         }
       }
-    , run: function(much, hold) {
+    , accel: function(much, hold) {
         if (hold) {
-          clearInterval(this.intervals.run)
-          var interval = function() { this.obj.run(much) }.bind(this)
-          this.intervals.run = setInterval(interval, Ink.frame)
+          clearInterval(this.intervals.accel)
+          var interval = function() { this.obj.accel(much) }.bind(this)
+          this.intervals.accel = setInterval(interval, Ink.frame)
         } else {
-          this.obj.run(much)
+          this.obj.accel(much)
         }
       }
     , inEdge: function() {
@@ -82,7 +82,7 @@
     this.shoot = function() {
       if (!this.alive || this.busy) return
       var len = this.shots.length
-        , shot = new Ink.Circle({ x: this.obj.x, y: this.obj.y, r: 1, fill: this.fill, stroke: this.stroke })
+        , shot = new Ink.Circ({ x: this.obj.x, y: this.obj.y, r: 1, fill: this.fill, stroke: this.stroke })
       shot.onCollide = function(obj) {
         if (obj !== undefined && typeof obj.onCollide == 'function') obj.onCollide()
         Ink.remove(hero.shots[len])
@@ -91,7 +91,7 @@
       setTimeout(shot.onCollide, level * 1000)
       shot.infiniteScope = true
       shot.rotation = this.obj.rotation
-      shot.run(13, 13)
+      shot.accel(13, 13)
       Ink.draw(shot)
       this.shots.push(shot)
       this.busy = true
@@ -165,10 +165,10 @@
           , init_accel = (179 * rand)/100
           , accel = init_accel/100 + acc/50
         obj.rotate(init)
-        obj.run(init_accel)
+        obj.accel(init_accel)
         return function() {
           obj.rotate(rotate)
-          obj.run(accel)
+          obj.accel(accel)
         }
      })(this), Ink.frame))
     }
@@ -232,8 +232,8 @@
       keys[key] = true
       if (key == 37) hero.rotate(-.1221,1)
       if (key == 39) hero.rotate( .1221,1)
-      if (key == 38) hero.run( .3, 1)
-      if (key == 40) hero.run(-.3, 1)
+      if (key == 38) hero.accel( .3, 1)
+      if (key == 40) hero.accel(-.3, 1)
       if (key == 32) {
         hero.shoot()
         keys[32] = false
@@ -244,8 +244,8 @@
       var key = e.charCode || e.keyCode
       if (key == 37) hero.rotate(keys[39] ?  .1221 : 0, 1) ; else
       if (key == 39) hero.rotate(keys[37] ? -.1221 : 0, 1) ; else
-      if (key == 38) hero.run(keys[40] ? -.3 : 0, 1) ; else
-      if (key == 40) hero.run(keys[38] ? -.3 : 0, 1)
+      if (key == 38) hero.accel (keys[40] ? -.3 : 0, 1) ; else
+      if (key == 40) hero.accel (keys[38] ? -.3 : 0, 1)
       if (keys[key]) {
         keys[key] = false
       }
@@ -263,7 +263,7 @@
     rocks.map(function(r) { r.clearIntervals() })
     hero  = null
     rocks = []
-    Ink.start({ clear : "rgba(0, 0, 0, .2)" }) // Starting Ink.js
+    Ink.init({ clear : "rgba(0, 0, 0, .2)" }) // Starting Ink.js
     hero = new Ship()
     levelRocks()
     if (!listeners) startEventListeners() // Event Listeners
