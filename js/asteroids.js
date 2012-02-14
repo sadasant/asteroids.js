@@ -13,8 +13,8 @@
   // Private Variables
   //·-----------------
 
-  var ids       = 0
-    , PI180     = M.PI/180
+  var ids = 0
+    , PI2 = M.PI*1.99
     , ship_path = [[0,-10],[-10,0],[10,0]]
     , listeners = false
     , rocks = []
@@ -38,8 +38,7 @@
           clearInterval(this.intervals[i])
         }
       }
-    , rotate: function(to, hold) {
-        var rad = to*PI180
+    , rotate: function(rad, hold) {
         if (hold) {
           clearInterval(this.intervals.rotate)
           var interval = function() { this.obj.rotation += rad }.bind(this)
@@ -71,7 +70,7 @@
     this.fill   = "rgba(150, 255, 0, 0.3)"
     this.stroke = "rgba(150, 255, 0, 1  )"
     this.obj = new Ink.Path({ x: Ink.center.x, y: Ink.center.y, v: ship_path, fill: this.fill, stroke: this.stroke })
-    this.obj.maxSpeed = {x:2,y:2}
+    this.obj.maxSpeed = { x: 2, y: 2}
     this.obj.infiniteScope = true
     Ink.draw(this.obj)
     this.obj.onCollide = (function() {
@@ -100,11 +99,8 @@
         hero.busy = false
       }, 500 - level * 50)
       setTimeout(function() {
-        if (hero.shots[len]) {
-          if (hero.shots[len]) {
-            hero.shots[len].addCollider(hero.obj)
-          }
-        }
+        var shot = hero.shots[len]
+        if (shot) shot.addCollider(hero.obj)
       }, 500)
       for (var i = 0; i < rocks.length; i++) {
         hero.shots[len].addCollider(rocks[i].obj)
@@ -145,12 +141,12 @@
         hero.obj.addCollider(rock2.obj)
         setTimeout(function shotSensitive(rock1, rock2) {
           for (var i = 0; i < hero.shots.length; i++) {
-            try {
-              rock1.obj.addCollider(hero.shots[i])
-              rock2.obj.addCollider(hero.shots[i])
-              hero.shots[i].addCollider(rock1.obj)
-              hero.shots[i].addCollider(rock2.obj)
-            } catch (e) {
+            var shot = hero.shots[i]
+            if (shot) {
+              rock1.obj.addCollider(shot)
+              rock2.obj.addCollider(shot)
+              shot.addCollider(rock1.obj)
+              shot.addCollider(rock2.obj)
             }
           }
         }.bind(null,rock1, rock2), Ink.frame * 10)
@@ -164,14 +160,15 @@
       acc = acc || 0
       this.intervals.push(setInterval((function(obj) {
         var rand = M.random()
-          , init = 179 * rand
-          , rotate = 1 + 5 * rand * (M.random() < .5 ? -1 : 1)
-          , accel = M.ceil(179 * rand)/100
+          , init = rand * PI2
+          , rotate = .01 + .0872 * rand * (M.random() < .5 ? -1 : 1)
+          , init_accel = (179 * rand)/100
+          , accel = init_accel/100 + acc/50
         obj.rotate(init)
-        obj.run(accel)
+        obj.run(init_accel)
         return function() {
           obj.rotate(rotate)
-          obj.run(accel/100 + acc/50) // important
+          obj.run(accel)
         }
      })(this), Ink.frame))
     }
@@ -222,35 +219,35 @@
 
   function startEventListeners() {
     var keys = {
-      37: null, 65:null
-    , 38: null, 87:null
-    , 39: null, 68:null
-    , 40: null, 83:null
-    , 32: null
+      37: false, 65: false
+    , 38: false, 87: false
+    , 39: false, 68: false
+    , 40: false, 83: false
+    , 32: false
     }
     doc.addEventListener("keydown", function (e) {
-      var i = 1, key = e.charCode || e.keyCode
-      if (!keys[key]) keys[key] = true, i = 0
-      if (!i) {
-        if (keys[37] || keys[65]) { hero.rotate(-7,1) ; i++ }
-        if (keys[39] || keys[68]) { hero.rotate(7,1)  ; i++ }
-        if (keys[38] || keys[87]) { hero.run(0.3,1)   ; i++ }
-        if (keys[40] || keys[83]) { hero.run(-0.3,1)  ; i++ }
-        if (keys[32]) {
-          hero.shoot()
-          keys[32] = null
-          i++
-        }
+      e.preventDefault()
+      var key = e.charCode || e.keyCode
+      if (keys[key]) return
+      keys[key] = true
+      if (key == 37) hero.rotate(-.1221,1)
+      if (key == 39) hero.rotate( .1221,1)
+      if (key == 38) hero.run( .3, 1)
+      if (key == 40) hero.run(-.3, 1)
+      if (key == 32) {
+        hero.shoot()
+        keys[32] = false
       }
-      if (i) return e.preventDefault()
     }, true)
     doc.addEventListener("keyup", function (e) {
+      e.preventDefault()
       var key = e.charCode || e.keyCode
-      if (key == 37 || key == 39 || key == 65 || key == 68) hero.rotate(0,1)
-      if (key == 38 || key == 40 || key == 87 || key == 83) hero.run(0,1)
+      if (key == 37) hero.rotate(keys[39] ?  .1221 : 0, 1) ; else
+      if (key == 39) hero.rotate(keys[37] ? -.1221 : 0, 1) ; else
+      if (key == 38) hero.run(keys[40] ? -.3 : 0, 1) ; else
+      if (key == 40) hero.run(keys[38] ? -.3 : 0, 1)
       if (keys[key]) {
-        keys[key] = null
-        return e.preventDefault()
+        keys[key] = false
       }
     }, true)
     listeners = true
