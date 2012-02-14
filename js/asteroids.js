@@ -15,6 +15,7 @@
 
   var ids       = 0
     , PI180     = M.PI/180
+    , ship_path = [[0,-10],[-10,0],[10,0]]
     , listeners = false
     , rocks = []
     , levels = []
@@ -69,7 +70,7 @@
     Ink.fork(Obj.prototype,this) // FORKING
     this.fill   = "rgba(150, 255, 0, 0.3)"
     this.stroke = "rgba(150, 255, 0, 1  )"
-    this.obj = new Ink.Triangle( Ink.center.x, Ink.center.y, null, this.fill, this.stroke)
+    this.obj = new Ink.Path({ x: Ink.center.x, y: Ink.center.y, v: ship_path, fill: this.fill, stroke: this.stroke })
     this.obj.maxSpeed = {x:2,y:2}
     this.obj.infiniteScope = true
     Ink.draw(this.obj)
@@ -82,7 +83,7 @@
     this.shoot = function() {
       if (!this.alive || this.busy) return
       var len = this.shots.length
-        , shot = new Ink.Circle(this.obj.x, this.obj.y, 1, this.fill, this.stroke)
+        , shot = new Ink.Circle({ x: this.obj.x, y: this.obj.y, r: 1, fill: this.fill, stroke: this.stroke })
       shot.onCollide = function(obj) {
         if (obj !== undefined && typeof obj.onCollide == 'function') obj.onCollide()
         Ink.remove(hero.shots[len])
@@ -122,7 +123,7 @@
       , stroke = "rgba(82, 163, 0, 1  )"
       , posx = x || (random ? M.floor(Ink.can.width  * M.random()) : Ink.center.x)
       , posy = y || (random ? M.floor(Ink.can.height * M.random()) : Ink.center.y)
-    this.obj = new Ink.Path(posx, posy, path, fill, stroke)
+    this.obj = new Ink.Path({ x: posx, y: posy, v: path, fill: fill, stroke: stroke })
     this.obj.maxSpeed = { x: 7, y: 7 }
     this.obj.infiniteScope = true
     // onCollide
