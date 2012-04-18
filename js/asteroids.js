@@ -11,19 +11,13 @@
     , U // undefined
 
   // Private Variables
-  //·-----------------
-
-  var ids = 0
-    , PI2 = M.PI*1.99
+  var ids       = 0
+    , level     = 0
+    , PI2       = M.PI*1.99
     , ship_path = [[0,-10],[-10,0],[10,0]]
     , listeners = false
-    , rocks = []
-    , levels = []
-    , level = 0
-    , hero
-    , ids
-    , level
-    , levels
+    , rocks     = []
+    , hero      // [Object Ship]
 
   // Avoid creating new functions every time
   function rotation_interval(rad) { this.obj.rotation += rad }
@@ -32,16 +26,19 @@
   // Object main prototype
   var Obj = function() {}
   Obj.prototype = {
+      // Interval's storage
       intervals : {
-        rotate : null
-      , accel  : null
+        rotate  : null
+      , accel   : null
       }
-    , clearIntervals: function() {
+      // Clear the intervals
+    , clearIntervals : function() {
         for (var i = 0, l = this.intervals.length; i < l; i++) {
           clearInterval(this.intervals[i])
         }
       }
-    , rotate: function(rad, hold) {
+      // Rotate by radians, hold the rotation? (keep-alive?)
+    , rotate : function(rad, hold) {
         if (hold) {
           clearInterval(this.intervals.rotate)
           this.intervals.rotate = setInterval(rotation_interval.bind(this, rad), Ink.frame)
@@ -49,7 +46,8 @@
           this.obj.rotation += rad
         }
       }
-    , accel: function(much, hold) {
+      // Accelerate much ammount of pixels
+    , accel : function(much, hold) {
         if (hold) {
           clearInterval(this.intervals.accel)
           this.intervals.accel = setInterval(acceleration_interval.bind(this, much), Ink.frame)
@@ -57,7 +55,11 @@
           this.obj.accel(much)
         }
       }
-    , inEdge: function() {
+      // Rotate in the same position
+      // the ship in the traditional asteroids behaves this way
+      // here, the ship behaves differently, but rocks still
+      // behave this way.
+    , inEdge : function() {
         this.obj.rotateInEdge = true
       }
   }
@@ -72,47 +74,71 @@
 
   // The Ship class
   function Ship() {
-    this.id    = (ids++).toString()
-    this.alive = true
-    this.busy  = false
-    Ink.fork(Obj.prototype,this) // FORKING
-    this.fill   = "rgba(150, 255, 0, 0.3)"
-    this.stroke = "rgba(150, 255, 0, 1  )"
-    this.obj = new Ink.Path(Ink.center.x, Ink.center.y, ship_path, this.fill, this.stroke)
-    this.obj.maxSpeed = { x: 2, y: 2}
-    this.obj.infiniteScope = true
-    Ink.draw(this.obj)
-    this.obj.onCollide = Ship_onCollide.bind(this)
-    this.shots = []
+    Ink.fork(Obj.prototype, this) // FORKING
+    var s               = this
+    s.id                = (ids++).toString()
+    s.alive             = true
+    s.busy              = false
+    s.fill              = "rgba(150, 255, 0, 0.3)"
+    s.stroke            = "rgba(150, 255, 0, 1  )"
+    s.obj               = new Ink.Path(Ink.center.x, Ink.center.y, ship_path, this.fill, this.stroke)
+    s.obj.maxSpeed      = { x: 2, y: 2}
+    s.obj.infiniteScope = true
+    s.obj.onCollide     = Ship_onCollide.bind(this)
+    s.shots             = []
+
+    Ink.draw(s.obj)
+
+    // Shoot method
     this.shoot = function() {
-      if (!this.alive || this.busy) return
-      var len = this.shots.length
-        , shot = new Ink.Circ(this.obj.x, this.obj.y, 1, this.fill, this.stroke)
+      // Not alive? Busy? Don't shoot.
+      if (!s.alive || s.busy) return
+
+      var len  = s.shots.length
+        , shot = new Ink.Circ(s.obj.x, s.obj.y, 1, s.fill, s.stroke)
+
+      // On collide, remove the shot and trigger
+      // the encountered's collision
       shot.onCollide = function(obj) {
-        if (obj !== U && typeof obj.onCollide == 'function') obj.onCollide()
-        Ink.remove(hero.shots[len])
-        hero.shots[len] = null
+        if (obj !== U && typeof obj.onCollide == 'function') {
+          obj.onCollide()
+        }
+        Ink.remove(s.shots[len])
+        s.shots[len] = null
       }
+
+      // The shoots will last according to the level
       setTimeout(shot.onCollide, level * 1000)
+
       shot.infiniteScope = true
-      shot.rotation = this.obj.rotation
+      shot.rotation      = this.obj.rotation
       shot.accel(13, 13)
+
       Ink.draw(shot)
-      this.shots.push(shot)
-      this.busy = true
+
+      s.shots.push(shot)
+      s.busy = true
+
+      // Limit shoot frecuency
+      // according to the ship's level
       setTimeout(function() {
-        hero.busy = false
+        s.busy = false
       }, 500 - level * 50)
+
+      // The shoot will collide with it's shooter
       setTimeout(function() {
-        var shot = hero.shots[len]
+        var shot = s.shots[len]
         if (shot) shot.addCollider(hero.obj)
       }, 500)
+
+      // The shoot will collide with rocks
       for (var i = 0, l = rocks.length; i < l; i++) {
-        hero.shots[len].addCollider(rocks[i].obj)
+        s.shots[len].addCollider(rocks[i].obj)
       }
     }
   }
 
+  // Avoiding the creation of this function each time a rock is made
   function Rock_onCollide() {
     var less = this.level - 1
     if (this.level === 3) { // lame solution
@@ -147,45 +173,51 @@
   // The Rock class
   function Rock(size, random, x, y){
     Ink.fork(Obj.prototype, this) // FORKING
-    this.id = (ids++).toString()
-    this.colliders = []
-    this.level = size || 2
-    var path = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]]
-      , fill   = "rgba(82, 163, 0, 0.3)"
-      , stroke = "rgba(82, 163, 0, 1  )"
-      , posx = x || (random ? M.floor(Ink.can.width  * M.random()) : Ink.center.x)
-      , posy = y || (random ? M.floor(Ink.can.height * M.random()) : Ink.center.y)
-    this.obj = new Ink.Path(posx, posy, path, fill, stroke)
-    this.obj.maxSpeed = { x: 7, y: 7 }
-    this.obj.infiniteScope = true
+    var s               = this
+    s.id                = (ids++).toString()
+    s.colliders         = []
+    s.level             = size || 2
+    var path            = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]]
+      , fill            = "rgba(82, 163, 0, 0.3)"
+      , stroke          = "rgba(82, 163, 0, 1  )"
+      , posx            = x || (random ? M.floor(Ink.can.width  * M.random()) : Ink.center.x)
+      , posy            = y || (random ? M.floor(Ink.can.height * M.random()) : Ink.center.y)
+    s.obj               = new Ink.Path(posx, posy, path, fill, stroke)
+    s.obj.maxSpeed      = { x: 7, y: 7 }
+    s.obj.infiniteScope = true
+    s.intervals         = []
+
     // onCollide
-    this.obj.collideArea = size * 10 + 10
-    this.obj.onCollide = Rock_onCollide.bind(this)
-    Ink.draw(this.obj)
-    this.intervals = []
-    this.randomize = function(acc) {
+    s.obj.collideArea = size * 10 + 10
+    s.obj.onCollide = Rock_onCollide.bind(this)
+
+    Ink.draw(s.obj)
+
+    // Randomize it's behavior
+    s.randomize = function(acc) {
       acc = acc || 0
-      this.intervals.push(setInterval((function(obj) {
-        var rand = M.random()
-          , init = rand * PI2
-          , rotate = .01 + .0872 * rand * (M.random() < .5 ? -1 : 1)
+      s.intervals.push(setInterval((function(obj) {
+        var rand       = M.random()
+          , init       = rand * PI2
+          , rotate     = .01 + .0872 * rand * (M.random() < .5 ? -1 : 1)
           , init_accel = (179 * rand)/100
-          , accel = init_accel/100 + acc/50
+          , accel      = init_accel/100 + acc/50
         obj.rotate(init)
         obj.accel(init_accel)
         return function() {
           obj.rotate(rotate)
           obj.accel(accel)
         }
-     })(this), Ink.frame))
+     })(s), Ink.frame))
     }
+
     // updateColliders
-    this.updateColliders = function() {
+    s.updateColliders = function() {
       for (var i = 0, l = rocks.length; i < l; i++){
         var id = rocks[i].id
-        if (id !== this.id && !~this.colliders.indexOf(id)) {
-          this.colliders.push(id)
-          this.obj.addCollider(rocks[i].obj)
+        if (id !== s.id && !~s.colliders.indexOf(id)) {
+          s.colliders.push(id)
+          s.obj.addCollider(rocks[i].obj)
         }
       }
     }
@@ -202,11 +234,11 @@
 
   function levelRocks(){
     level++
-    var level_speed = level/3
-    hero.obj.maxSpeed.x += level_speed
-    hero.obj.maxSpeed.y += level_speed
+    var level_speed                       = level/3
+    hero.obj.maxSpeed.x                  += level_speed
+    hero.obj.maxSpeed.y                  += level_speed
     doc.getElementById("level").innerHTML = level - 1
-    var lev = M.ceil(level/3)
+    var lev                               = M.ceil(level/3)
     levels.push(lev)
     for (var i = 0; i < lev; i++) {
       rocks.push(new Rock(3, true))
@@ -226,11 +258,11 @@
 
   function startEventListeners() {
     var keys = {
-      37: false, 65: false
-    , 38: false, 87: false
-    , 39: false, 68: false
-    , 40: false, 83: false
-    , 32: false
+      37 : false, 65 : false
+    , 38 : false, 87 : false
+    , 39 : false, 68 : false
+    , 40 : false, 83 : false
+    , 32 : false
     }
     doc.addEventListener("keydown", function (e) {
       e.preventDefault()
