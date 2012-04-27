@@ -108,11 +108,11 @@
       }
 
       // The shoots will last according to the level
-      setTimeout(shot.onCollide, level * 1000)
+      setTimeout(shot.onCollide, 250 << level)
 
       shot.infiniteScope = true
       shot.rotation      = this.obj.rotation
-      shot.accel(13, 13)
+      shot.accel(7, 7)
 
       Ink.draw(shot)
 
@@ -138,7 +138,7 @@
     }
   }
 
-  // Avoiding the creation of this function each time a rock is made
+  // To avoid initializing this function each time a rock is made
   function Rock_onCollide() {
     var less = this.level - 1
     if (this.level === 3) { // lame solution
@@ -271,8 +271,8 @@
       keys[key] = true
       if (key == 37) hero.rotate(-.1221,1)
       if (key == 39) hero.rotate( .1221,1)
-      if (key == 38) hero.accel( .3, 1)
-      if (key == 40) hero.accel(-.3, 1)
+      if (key == 38) hero.accel( .2, 1)
+      if (key == 40) hero.accel(-.2, 1)
       if (key == 32) {
         hero.shoot()
         keys[32] = false
@@ -283,8 +283,8 @@
       var key = e.charCode || e.keyCode
       if (key == 37) hero.rotate(keys[39] ?  .1221 : 0, 1) ; else
       if (key == 39) hero.rotate(keys[37] ? -.1221 : 0, 1) ; else
-      if (key == 38) hero.accel (keys[40] ? -.3 : 0, 1) ; else
-      if (key == 40) hero.accel (keys[38] ? -.3 : 0, 1)
+      if (key == 38) hero.accel (keys[40] ? -.2 : 0, 1) ; else
+      if (key == 40) hero.accel (keys[38] ? -.2 : 0, 1)
       if (keys[key]) {
         keys[key] = false
       }
@@ -292,6 +292,7 @@
     listeners = true
   }
 
+  var started = 0
   // The start function
   function start() {
     ids    = 0
@@ -304,8 +305,17 @@
     rocks = []
     Ink.init(U, U, U, "rgba(0, 0, 0, .2)") // Starting Ink.js
     hero = new Ship()
+    /**/
+    // Uncomment the 3 lines below and comment the 2 lines above
+    // to test a more traditional asteroids game
+    /*
+    Ink.init(U, U, U, "rgba(0, 0, 0, 1)") // Starting Ink.js
+    hero = new Ship()
+    hero.obj.rotateInEdge  = true
+    */
     levelRocks()
     if (!listeners) startEventListeners() // Event Listeners
+
   }
 
   // API
