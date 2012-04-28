@@ -108,7 +108,7 @@
       }
 
       // The shoots will last according to the level
-      setTimeout(shot.onCollide, 250 << level)
+      setTimeout(shot.onCollide, 500 * level)
 
       shot.infiniteScope = true
       shot.rotation      = this.obj.rotation
