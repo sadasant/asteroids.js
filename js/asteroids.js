@@ -112,7 +112,8 @@
 
       shot.infiniteScope = true
       shot.rotation      = this.obj.rotation
-      shot.accel(7, 7)
+      var shot_acc = 2 + s.obj.maxSpeed.x
+      shot.accel(shot_acc, shot_acc)
 
       Ink.draw(shot)
 
