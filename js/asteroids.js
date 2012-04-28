@@ -180,8 +180,8 @@
     var path            = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]]
       , fill            = "rgba(82, 163, 0, 0.3)"
       , stroke          = "rgba(82, 163, 0, 1  )"
-      , posx            = x || (random ? M.floor(Ink.can.width  * M.random()) : Ink.center.x)
-      , posy            = y || (random ? M.floor(Ink.can.height * M.random()) : Ink.center.y)
+      , posx            = x || (random ? Ink.can.width  * M.random() << 0 : Ink.center.x)
+      , posy            = y || (random ? Ink.can.height * M.random() << 0 : Ink.center.y)
     s.obj               = new Ink.Path(posx, posy, path, fill, stroke)
     s.obj.maxSpeed      = { x: 7, y: 7 }
     s.obj.infiniteScope = true
