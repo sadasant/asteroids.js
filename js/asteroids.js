@@ -251,7 +251,7 @@
       , l = rocks.length
     setTimeout(function() {
       for (; i < l; i++) {
-        rocks[i].updateColliders()
+        rocks[i] && rocks[i].updateColliders()
       }
     }, t)
   }
