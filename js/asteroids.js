@@ -43,7 +43,7 @@
   , clearIntervals : function() {
       var i = 0
         , l = this.intervals.length
-      for (; i < l; i++) {
+      for (; i < l; i+=1) {
         clearInterval(this.intervals[i])
       }
     }
@@ -85,7 +85,7 @@
   // The Ship class
   function Ship() {
     var s = Object.create(Main)
-    s.id                = (ids++).toString()
+    s.id                = (ids+=1).toString()
     s.alive             = true
     s.busy              = false
     s.fill              = "rgba(150, 255, 0, 0.3)"
@@ -145,7 +145,7 @@
       // The shoot will collide with rocks
       i = 0
       l = rocks.length
-      for (; i < l; i++) {
+      for (; i < l; i+=1) {
         s.shots[len].addCollider(rocks[i].obj)
       }
     }
@@ -174,7 +174,7 @@
       i = 0
       l = hero.shots.length
       setTimeout(function shotSensitive(rock1, rock2) {
-        for (; i < l; i++) {
+        for (; i < l; i+=1) {
           shot = hero.shots[i]
           if (shot) {
             rock1.obj.addCollider(shot)
@@ -197,7 +197,7 @@
       , stroke          = "rgba(82, 163, 0, 1  )"
       , posx            = x || (random ? Ink.can.width  * M.random() << 0 : Ink.center.x)
       , posy            = y || (random ? Ink.can.height * M.random() << 0 : Ink.center.y)
-    s.id                = (ids++).toString()
+    s.id                = (ids+=1).toString()
     s.colliders         = []
     s.level             = size || 2
     s.obj               = new Ink.Path(posx, posy, path, fill, stroke)
@@ -233,7 +233,7 @@
     s.updateColliders = function() {
       var i = 0
         , l = rocks.length
-      for (; i < l; i++){
+      for (; i < l; i+=1){
         var id = rocks[i].id
         if (id !== s.id && !~s.colliders.indexOf(id)) {
           s.colliders.push(id)
@@ -250,14 +250,14 @@
     var i = 0
       , l = rocks.length
     setTimeout(function() {
-      for (; i < l; i++) {
+      for (; i < l; i+=1) {
         rocks[i] && rocks[i].updateColliders()
       }
     }, t)
   }
 
   function levelRocks(){
-    level++
+    level+=1
     var level_speed = level/level_factor
       , lev         = M.ceil(level/level_factor)
       , i = 0
@@ -267,7 +267,7 @@
     hero.obj.maxSpeed.y += level_speed
     doc.getElementById("level").innerHTML = level - 1
     levels.push(lev)
-    for (; i < lev; i++) {
+    for (; i < lev; i+=1) {
       rocks.push(new Rock(level_factor, true))
       rock = rocks[rocks.length - 1]
       rock.inEdge()
