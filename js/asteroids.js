@@ -219,7 +219,8 @@
   // The Rock class
   function Rock(size, random, x, y){
     var s = Object.create(Main)
-      , path            = [[0,-size*10],[-size*10,0],[-size*10/2,size*10],[size*10,0]]
+      , size10          = size * 10
+      , path            = [[0,-size10],[-size10,0],[-size10/2,size10],[size10,0]]
       , fill            = "rgba(82, 163, 0, 0.3)"
       , border_color    = "rgba(82, 163, 0, 1  )"
       , posx            = x || (random ? Ink.can.width  * M.random() << 0 : Ink.center.x)
